@@ -21,7 +21,7 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_super_secret_key_change_in_
 CORS(app)
 
 # Configure Gemini API
-genai.configure(api_key=os.getenv("GEMINI_API_KEY", "AIzaSyBAMoyrCjxcvqZPi7NpjQ2eO_58gphY_Us"))
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 DATABASE = 'fibrotracker.db'
 
