@@ -106,11 +106,14 @@ def init_db():
         # -------------------------------------------------
         # Primary Symptoms
         # -------------------------------------------------
+        # -------------------------------------------------
+        # Primary Symptoms
+        # -------------------------------------------------
         conn.execute('''
         CREATE TABLE IF NOT EXISTS primary_symptoms (
             symptom_id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            pain_score INTEGER CHECK(pain_score BETWEEN 0 AND 10),
+            pain_score INTEGER CHECK(pain_score BETWEEN 0 AND 19),
             fatigue_score INTEGER CHECK(fatigue_score BETWEEN 0 AND 10),
             sleep_score INTEGER CHECK(sleep_score BETWEEN 0 AND 10),
             cognitive_score INTEGER CHECK(cognitive_score BETWEEN 0 AND 10),
@@ -297,6 +300,41 @@ def check_and_migrate_db():
             conn.execute('ALTER TABLE daily_entries ADD COLUMN menstrual_phase TEXT')
         if 'pain_area_count' not in columns:
             conn.execute('ALTER TABLE daily_entries ADD COLUMN pain_area_count INTEGER')
+
+        # -------------------------------------------------
+        # FIX: primary_symptoms pain_score constraint (0-10 -> 0-19)
+        # -------------------------------------------------
+        # Check if we need to migrate by inspecting sql (approximated) or just do it safely
+        # We can try to insert a dummy value > 10 in a transaction and see if it fails, then migrate?
+        # Or just checking if we already migrated. 
+        # Easier: Let's check table sql or just force migration if we haven't tracked it.
+        # Since we don't have a migration version table, we'll check schema.
+        
+        cursor = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='primary_symptoms'")
+        row = cursor.fetchone()
+        if row and 'CHECK(pain_score BETWEEN 0 AND 10)' in row['sql']:
+            print("Migrating primary_symptoms table to allow higher pain score...")
+            with conn:
+                conn.execute("ALTER TABLE primary_symptoms RENAME TO primary_symptoms_old")
+                conn.execute('''
+                    CREATE TABLE primary_symptoms (
+                        symptom_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        pain_score INTEGER CHECK(pain_score BETWEEN 0 AND 19),
+                        fatigue_score INTEGER CHECK(fatigue_score BETWEEN 0 AND 10),
+                        sleep_score INTEGER CHECK(sleep_score BETWEEN 0 AND 10),
+                        cognitive_score INTEGER CHECK(cognitive_score BETWEEN 0 AND 10),
+                        total_score INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                ''')
+                conn.execute('''
+                    INSERT INTO primary_symptoms (symptom_id, user_id, pain_score, fatigue_score, sleep_score, cognitive_score, total_score)
+                    SELECT symptom_id, user_id, pain_score, fatigue_score, sleep_score, cognitive_score, total_score
+                    FROM primary_symptoms_old
+                ''')
+                conn.execute("DROP TABLE primary_symptoms_old")
+            print("Migration of primary_symptoms completed.")
             
     except Exception as e:
         print(f"Migration error (harmless if already up to date): {e}")
