@@ -1,0 +1,1317 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Symptom Entry - FibroTracker{% endblock %}
+
+{% block page_title %}Daily Symptom Entry{% endblock %}
+
+{% block content %}
+<div class="daily-entry-page">
+    <div class="entry-container">
+
+        <!-- Progress Header -->
+        <div class="progress-header">
+            <div class="progress-title">
+                <i class="fas fa-tasks"></i>
+                <span>Entry Progress</span>
+            </div>
+            <div class="progress-percent" id="progress-percent">25%</div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-bar" style="width: 25%;"></div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs-container">
+            <div class="nav-tab active" data-tab="date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Date</span>
+            </div>
+            <div class="nav-tab" data-tab="symptoms">
+                <i class="fas fa-heartbeat"></i>
+                <span>Symptoms</span>
+            </div>
+            <div class="nav-tab" data-tab="painmap">
+                <i class="fas fa-child"></i>
+                <span>Pain Map</span>
+            </div>
+            <div class="nav-tab" data-tab="activity">
+                <i class="fas fa-running"></i>
+                <span>Activity</span>
+            </div>
+        </div>
+
+        <form id="daily-entry-form">
+            <!-- Tab 1: Date Selection -->
+            <div class="tab-content active" id="tab-date">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-calendar-check"></i>
+                            <h3>Entry Date</h3>
+                        </div>
+                        <p class="section-subtitle">Select the date for this symptom entry</p>
+                    </div>
+                    <div class="section-divider"></div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label for="entry_date">Date</label>
+                            <div class="date-input-wrapper">
+                                <input type="date" id="entry_date" name="entry_date" class="form-control date-input"
+                                    required>
+                                <i class="fas fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+                        <div class="quick-date-buttons">
+                            <button type="button" class="quick-date-btn" id="btn-yesterday">Yesterday</button>
+                            <button type="button" class="quick-date-btn" id="btn-today">Today</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Symptoms -->
+            <div class="tab-content" id="tab-symptoms">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-heartbeat"></i>
+                            <h3>Daily Symptoms</h3>
+                        </div>
+                        <p class="section-subtitle">Rate your symptoms from 0 (None) to 10 (Worst)</p>
+                    </div>
+                    <div class="section-divider"></div>
+                    <div class="section-body">
+
+                        <!-- Pain Intensity -->
+                        <div class="symptom-item">
+                            <div class="symptom-header">
+                                <span class="symptom-number">1</span>
+                                <div class="symptom-info">
+                                    <strong>Pain Intensity</strong>
+                                    <p>How severe was your overall body pain today?</p>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <input type="range" id="pain_score" name="pain_score" min="0" max="10" value="0"
+                                    class="modern-slider" oninput="updateSlider('pain_score', 'pain_out')">
+                                <div class="slider-value-bubble" id="pain_out">0</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>None</span>
+                                <span>Worst</span>
+                            </div>
+                        </div>
+
+                        <!-- Fatigue Severity -->
+                        <div class="symptom-item">
+                            <div class="symptom-header">
+                                <span class="symptom-number">2</span>
+                                <div class="symptom-info">
+                                    <strong>Fatigue Severity</strong>
+                                    <p>How fatigued or exhausted did you feel today?</p>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <input type="range" id="fatigue_score" name="fatigue_score" min="0" max="10" value="0"
+                                    class="modern-slider" oninput="updateSlider('fatigue_score', 'fatigue_out')">
+                                <div class="slider-value-bubble" id="fatigue_out">0</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>None</span>
+                                <span>Worst</span>
+                            </div>
+                        </div>
+
+                        <!-- Sleep Quality -->
+                        <div class="symptom-item">
+                            <div class="symptom-header">
+                                <span class="symptom-number">3</span>
+                                <div class="symptom-info">
+                                    <strong>Sleep Quality</strong>
+                                    <p>How refreshing was your sleep last night?</p>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <input type="range" id="sleep_quality" name="sleep_quality" min="0" max="10" value="5"
+                                    class="modern-slider" oninput="updateSlider('sleep_quality', 'sleep_out')">
+                                <div class="slider-value-bubble" id="sleep_out">5</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>Not Refreshing</span>
+                                <span>Fully Refreshing</span>
+                            </div>
+                        </div>
+
+                        <!-- Cognitive Difficulty -->
+                        <div class="symptom-item">
+                            <div class="symptom-header">
+                                <span class="symptom-number">4</span>
+                                <div class="symptom-info">
+                                    <strong>Cognitive Difficulty (Fibro Fog)</strong>
+                                    <p>Difficulty with concentration, memory, or mental clarity?</p>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <input type="range" id="cognitive_difficulty" name="cognitive_difficulty" min="0"
+                                    max="10" value="0" class="modern-slider"
+                                    oninput="updateSlider('cognitive_difficulty', 'cog_out')">
+                                <div class="slider-value-bubble" id="cog_out">0</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>None</span>
+                                <span>Severe</span>
+                            </div>
+                        </div>
+
+                        <!-- Stress Level -->
+                        <div class="symptom-item">
+                            <div class="symptom-header">
+                                <span class="symptom-number">5</span>
+                                <div class="symptom-info">
+                                    <strong>Stress Level</strong>
+                                    <p>How stressful was your day overall?</p>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <input type="range" id="stress_score" name="stress_score" min="0" max="10" value="0"
+                                    class="modern-slider" oninput="updateSlider('stress_score', 'stress_out')">
+                                <div class="slider-value-bubble" id="stress_out">0</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>Relaxed</span>
+                                <span>Extremely Stressed</span>
+                            </div>
+                        </div>
+
+                        <!-- Sensory Sensitivity -->
+                        <div class="symptom-item">
+                            <div class="symptom-header">
+                                <span class="symptom-number">6</span>
+                                <div class="symptom-info">
+                                    <strong>Sensory Sensitivity</strong>
+                                    <p>Did light, noise, or strong smells bother you today?</p>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <input type="range" id="sensory_sensitivity_score" name="sensory_sensitivity_score"
+                                    min="0" max="10" value="0" class="modern-slider"
+                                    oninput="updateSlider('sensory_sensitivity_score', 'sensory_out')">
+                                <div class="slider-value-bubble" id="sensory_out">0</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>Not at all</span>
+                                <span>Very Much</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Pain Map -->
+            <div class="tab-content" id="tab-painmap">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-child"></i>
+                            <h3>Pain Locations</h3>
+                        </div>
+                        <p class="section-subtitle">Select all body areas where you feel pain today</p>
+                    </div>
+                    <div class="section-divider"></div>
+                    <div class="section-body">
+
+                        <!-- Head & Neck Region -->
+                        <div class="body-region-group">
+                            <div class="region-group-title">
+                                <i class="fas fa-head-side"></i>
+                                <span>Head & Neck</span>
+                            </div>
+                            <div class="body-parts-grid">
+                                <div class="body-part-card" data-region="jaw-left">
+                                    <div class="part-icon">🦷</div>
+                                    <span>Left Jaw</span>
+                                </div>
+                                <div class="body-part-card" data-region="jaw-right">
+                                    <div class="part-icon">🦷</div>
+                                    <span>Right Jaw</span>
+                                </div>
+                                <div class="body-part-card" data-region="neck">
+                                    <div class="part-icon">🔘</div>
+                                    <span>Neck</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shoulders & Arms Region -->
+                        <div class="body-region-group">
+                            <div class="region-group-title">
+                                <i class="fas fa-hand-paper"></i>
+                                <span>Shoulders & Arms</span>
+                            </div>
+                            <div class="body-parts-grid">
+                                <div class="body-part-card" data-region="shoulder-left">
+                                    <div class="part-icon">💪</div>
+                                    <span>Left Shoulder</span>
+                                </div>
+                                <div class="body-part-card" data-region="shoulder-right">
+                                    <div class="part-icon">💪</div>
+                                    <span>Right Shoulder</span>
+                                </div>
+                                <div class="body-part-card" data-region="upper-arm-left">
+                                    <div class="part-icon">🦾</div>
+                                    <span>Left Upper Arm</span>
+                                </div>
+                                <div class="body-part-card" data-region="upper-arm-right">
+                                    <div class="part-icon">🦾</div>
+                                    <span>Right Upper Arm</span>
+                                </div>
+                                <div class="body-part-card" data-region="lower-arm-left">
+                                    <div class="part-icon">✋</div>
+                                    <span>Left Lower Arm</span>
+                                </div>
+                                <div class="body-part-card" data-region="lower-arm-right">
+                                    <div class="part-icon">✋</div>
+                                    <span>Right Lower Arm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Torso Region -->
+                        <div class="body-region-group">
+                            <div class="region-group-title">
+                                <i class="fas fa-male"></i>
+                                <span>Torso</span>
+                            </div>
+                            <div class="body-parts-grid">
+                                <div class="body-part-card" data-region="chest">
+                                    <div class="part-icon">🫁</div>
+                                    <span>Chest</span>
+                                </div>
+                                <div class="body-part-card" data-region="abdomen">
+                                    <div class="part-icon">🔴</div>
+                                    <span>Abdomen</span>
+                                </div>
+                                <div class="body-part-card" data-region="upper-back">
+                                    <div class="part-icon">🔙</div>
+                                    <span>Upper Back</span>
+                                </div>
+                                <div class="body-part-card" data-region="lower-back">
+                                    <div class="part-icon">🔙</div>
+                                    <span>Lower Back</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hips & Legs Region -->
+                        <div class="body-region-group">
+                            <div class="region-group-title">
+                                <i class="fas fa-shoe-prints"></i>
+                                <span>Hips & Legs</span>
+                            </div>
+                            <div class="body-parts-grid">
+                                <div class="body-part-card" data-region="hip-left">
+                                    <div class="part-icon">🦴</div>
+                                    <span>Left Hip</span>
+                                </div>
+                                <div class="body-part-card" data-region="hip-right">
+                                    <div class="part-icon">🦴</div>
+                                    <span>Right Hip</span>
+                                </div>
+                                <div class="body-part-card" data-region="upper-leg-left">
+                                    <div class="part-icon">🦵</div>
+                                    <span>Left Thigh</span>
+                                </div>
+                                <div class="body-part-card" data-region="upper-leg-right">
+                                    <div class="part-icon">🦵</div>
+                                    <span>Right Thigh</span>
+                                </div>
+                                <div class="body-part-card" data-region="lower-leg-left">
+                                    <div class="part-icon">🦶</div>
+                                    <span>Left Lower Leg</span>
+                                </div>
+                                <div class="body-part-card" data-region="lower-leg-right">
+                                    <div class="part-icon">🦶</div>
+                                    <span>Right Lower Leg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pain-count-display">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Selected Areas:</span>
+                            <div class="count-badge" id="pain_area_count">0</div>
+                        </div>
+                        <input type="hidden" id="pain_area_count_input" name="pain_area_count" value="0">
+                        <input type="hidden" id="wpi_hidden" name="wpi_hidden" value="[]">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Activity & Triggers -->
+            <div class="tab-content" id="tab-activity">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-running"></i>
+                            <h3>Activity & Triggers</h3>
+                        </div>
+                        <p class="section-subtitle">Track factors that may affect your symptoms</p>
+                    </div>
+                    <div class="section-divider"></div>
+                    <div class="section-body">
+
+                        <!-- Physical Activity Level -->
+                        <div class="activity-item">
+                            <div class="activity-header">
+                                <i class="fas fa-walking"></i>
+                                <strong>Physical Activity Level</strong>
+                            </div>
+                            <p class="activity-desc">What was your overall physical activity today?</p>
+                            <div class="option-cards">
+                                <label class="option-card">
+                                    <input type="radio" name="physical_activity_level" value="Low" checked>
+                                    <div class="option-content">
+                                        <i class="fas fa-couch"></i>
+                                        <span>Low</span>
+                                        <small>Minimal movement</small>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="physical_activity_level" value="Moderate">
+                                    <div class="option-content">
+                                        <i class="fas fa-walking"></i>
+                                        <span>Moderate</span>
+                                        <small>Routine activities</small>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="physical_activity_level" value="High">
+                                    <div class="option-content">
+                                        <i class="fas fa-running"></i>
+                                        <span>High</span>
+                                        <small>Exercise, physical effort</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Sleep Duration -->
+                        <div class="activity-item">
+                            <div class="activity-header">
+                                <i class="fas fa-bed"></i>
+                                <strong>Sleep Duration</strong>
+                            </div>
+                            <p class="activity-desc">How many hours did you sleep last night?</p>
+                            <div class="option-pills">
+                                <label class="option-pill">
+                                    <input type="radio" name="sleep_duration_category" value="< 5 hours" checked>
+                                    <span>&lt; 5 hrs</span>
+                                </label>
+                                <label class="option-pill">
+                                    <input type="radio" name="sleep_duration_category" value="5-6 hours">
+                                    <span>5–6 hrs</span>
+                                </label>
+                                <label class="option-pill">
+                                    <input type="radio" name="sleep_duration_category" value="6-7 hours">
+                                    <span>6–7 hrs</span>
+                                </label>
+                                <label class="option-pill">
+                                    <input type="radio" name="sleep_duration_category" value="> 7 hours">
+                                    <span>&gt; 7 hrs</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Weather Sensitivity -->
+                        <div class="activity-item">
+                            <div class="activity-header">
+                                <i class="fas fa-cloud-sun"></i>
+                                <strong>Weather Sensitivity</strong>
+                            </div>
+                            <p class="activity-desc">Did weather changes worsen your symptoms today?</p>
+                            <div class="toggle-buttons">
+                                <label class="toggle-btn">
+                                    <input type="radio" name="weather_sensitivity_bool" value="1">
+                                    <span>Yes</span>
+                                </label>
+                                <label class="toggle-btn">
+                                    <input type="radio" name="weather_sensitivity_bool" value="0" checked>
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Recent Infection -->
+                        <div class="activity-item">
+                            <div class="activity-header">
+                                <i class="fas fa-virus"></i>
+                                <strong>Recent Infection or Illness</strong>
+                            </div>
+                            <p class="activity-desc">Did you experience fever, cold, flu, or any infection today?</p>
+                            <div class="toggle-buttons">
+                                <label class="toggle-btn">
+                                    <input type="radio" name="recent_infection" value="1">
+                                    <span>Yes</span>
+                                </label>
+                                <label class="toggle-btn">
+                                    <input type="radio" name="recent_infection" value="0" checked>
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Menstrual Phase -->
+                        <div class="activity-item">
+                            <div class="activity-header">
+                                <i class="fas fa-venus"></i>
+                                <strong>Menstrual Phase (Women Only)</strong>
+                            </div>
+                            <p class="activity-desc">What phase of your menstrual cycle are you in?</p>
+                            <select name="menstrual_phase" id="menstrual_phase" class="modern-select">
+                                <option value="Not applicable" selected>Not applicable</option>
+                                <option value="Menstruation">Menstruation</option>
+                                <option value="Follicular">Follicular</option>
+                                <option value="Luteal">Luteal</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <button type="button" class="nav-btn prev-btn" id="prev-btn" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button type="button" class="nav-btn next-btn" id="next-btn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="submit" class="nav-btn submit-btn" id="submit-btn" style="display: none;">
+                    <i class="fas fa-save"></i> Save Entry
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #3b82f6;
+        --light-blue: #dbeafe;
+        --bg-color: #f1f5f9;
+        --card-bg: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+    }
+
+    .daily-entry-page {
+        background: var(--bg-color);
+        min-height: 100vh;
+        padding: 1rem;
+    }
+
+    .entry-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* Progress Header */
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .progress-title i {
+        color: var(--text-secondary);
+    }
+
+    .progress-percent {
+        font-weight: 700;
+        color: var(--primary-blue);
+        font-size: 1.1rem;
+    }
+
+    .progress-bar-container {
+        height: 6px;
+        background: var(--border-color);
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #60a5fa, var(--primary-blue));
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-tab {
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
+        padding: 1rem 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .nav-tab i {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+    }
+
+    .nav-tab span {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .nav-tab:hover {
+        border-color: var(--light-blue);
+    }
+
+    .nav-tab.active {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border-color: var(--primary-blue);
+    }
+
+    .nav-tab.active i,
+    .nav-tab.active span {
+        color: var(--primary-blue);
+    }
+
+    .nav-tab.completed {
+        background: #f0fdf4;
+        border-color: #22c55e;
+    }
+
+    .nav-tab.completed i,
+    .nav-tab.completed span {
+        color: #22c55e;
+    }
+
+    /* Section Card */
+    .section-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+    }
+
+    .section-title h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .section-subtitle {
+        margin: 0.5rem 0 0 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-left: 2rem;
+    }
+
+    .section-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 0 1.5rem;
+    }
+
+    .section-body {
+        padding: 1.5rem;
+    }
+
+    /* Tab Content */
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Date Tab Styles */
+    .date-input-wrapper {
+        position: relative;
+    }
+
+    .date-input {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 1rem;
+        color: var(--text-primary);
+        background: #fafafa;
+    }
+
+    .date-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .date-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    .quick-date-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .quick-date-btn {
+        padding: 0.75rem 2rem;
+        background: #f1f5f9;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .quick-date-btn:hover {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+
+    /* Symptom Items */
+    .symptom-item {
+        padding: 1.25rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .symptom-item:last-child {
+        border-bottom: none;
+    }
+
+    .symptom-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .symptom-number {
+        width: 28px;
+        height: 28px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .symptom-info strong {
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .symptom-info p {
+        margin: 0.25rem 0 0 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0.75rem 0;
+        padding-left: 2.75rem;
+    }
+
+    .modern-slider {
+        flex: 1;
+        height: 8px;
+        -webkit-appearance: none;
+        background: #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .modern-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        background: var(--primary-blue);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+    }
+
+    .slider-value-bubble {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    .slider-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        padding-left: 2.75rem;
+    }
+
+    /* Body Part Cards */
+    .body-region-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .region-group-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .region-group-title i {
+        color: var(--primary-blue);
+    }
+
+    .body-parts-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+
+    .body-part-card {
+        background: #fafafa;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .body-part-card:hover {
+        border-color: var(--light-blue);
+        background: #f0f7ff;
+    }
+
+    .body-part-card.selected {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        border-color: #f87171;
+    }
+
+    .body-part-card.selected .part-icon {
+        transform: scale(1.1);
+    }
+
+    .body-part-card.selected span {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .part-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+        transition: transform 0.2s;
+    }
+
+    .body-part-card span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .pain-count-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #fafafa;
+        border-radius: var(--radius-sm);
+        margin-top: 1rem;
+    }
+
+    .pain-count-display i {
+        color: var(--primary-blue);
+    }
+
+    .count-badge {
+        width: 36px;
+        height: 36px;
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    /* Activity Tab */
+    .activity-item {
+        padding: 1.25rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .activity-header i {
+        color: var(--primary-blue);
+    }
+
+    .activity-header strong {
+        color: var(--text-primary);
+    }
+
+    .activity-desc {
+        margin: 0 0 1rem 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        padding-left: 1.75rem;
+    }
+
+    .option-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .option-card {
+        cursor: pointer;
+    }
+
+    .option-card input {
+        display: none;
+    }
+
+    .option-content {
+        padding: 1rem;
+        background: #fafafa;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+    .option-content i {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .option-content span {
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .option-content small {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+    }
+
+    .option-card input:checked+.option-content {
+        background: var(--light-blue);
+        border-color: var(--primary-blue);
+    }
+
+    .option-card input:checked+.option-content i,
+    .option-card input:checked+.option-content span {
+        color: var(--primary-blue);
+    }
+
+    .option-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .option-pill {
+        cursor: pointer;
+    }
+
+    .option-pill input {
+        display: none;
+    }
+
+    .option-pill span {
+        display: inline-block;
+        padding: 0.6rem 1.25rem;
+        background: #fafafa;
+        border: 2px solid var(--border-color);
+        border-radius: 50px;
+        font-weight: 500;
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+
+    .option-pill input:checked+span {
+        background: var(--light-blue);
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+    }
+
+    .toggle-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .toggle-btn {
+        cursor: pointer;
+    }
+
+    .toggle-btn input {
+        display: none;
+    }
+
+    .toggle-btn span {
+        display: inline-block;
+        padding: 0.6rem 2rem;
+        background: #fafafa;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .toggle-btn input:checked+span {
+        background: var(--light-blue);
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+    }
+
+    .modern-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 1rem;
+        color: var(--text-primary);
+        background: #fafafa;
+        cursor: pointer;
+    }
+
+    .modern-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+
+    /* Navigation Buttons */
+    .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+
+    .nav-btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .prev-btn {
+        background: #f1f5f9;
+        color: var(--text-primary);
+    }
+
+    .prev-btn:hover {
+        background: #e2e8f0;
+    }
+
+    .next-btn {
+        background: var(--primary-blue);
+        color: white;
+        margin-left: auto;
+    }
+
+    .next-btn:hover {
+        background: #2563eb;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        margin-left: auto;
+    }
+
+    .submit-btn:hover {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+        .nav-tabs-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .option-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .nav-buttons {
+            flex-direction: column;
+        }
+
+        .nav-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    // Tab Navigation
+    const tabs = ['date', 'symptoms', 'painmap', 'activity'];
+    let currentTabIndex = 0;
+
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercent = document.getElementById('progress-percent');
+
+    function updateTabUI() {
+        // Update tab appearance
+        navTabs.forEach((tab, index) => {
+            tab.classList.remove('active');
+            if (index < currentTabIndex) {
+                tab.classList.add('completed');
+            }
+            if (index === currentTabIndex) {
+                tab.classList.add('active');
+                tab.classList.remove('completed');
+            }
+        });
+
+        // Update content visibility
+        tabContents.forEach((content, index) => {
+            content.classList.remove('active');
+            if (index === currentTabIndex) {
+                content.classList.add('active');
+            }
+        });
+
+        // Update buttons
+        prevBtn.style.display = currentTabIndex === 0 ? 'none' : 'flex';
+        if (currentTabIndex === tabs.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'flex';
+        } else {
+            nextBtn.style.display = 'flex';
+            submitBtn.style.display = 'none';
+        }
+
+        // Update progress
+        const progress = ((currentTabIndex + 1) / tabs.length) * 100;
+        progressBar.style.width = progress + '%';
+        progressPercent.textContent = Math.round(progress) + '%';
+    }
+
+    navTabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            currentTabIndex = index;
+            updateTabUI();
+        });
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentTabIndex > 0) {
+            currentTabIndex--;
+            updateTabUI();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentTabIndex < tabs.length - 1) {
+            currentTabIndex++;
+            updateTabUI();
+        }
+    });
+
+    // Set default date to today
+    document.getElementById('entry_date').valueAsDate = new Date();
+
+    // Quick date buttons
+    document.getElementById('btn-yesterday').addEventListener('click', () => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        document.getElementById('entry_date').valueAsDate = yesterday;
+    });
+
+    document.getElementById('btn-today').addEventListener('click', () => {
+        document.getElementById('entry_date').valueAsDate = new Date();
+    });
+
+    // Slider update function
+    function updateSlider(sliderId, outputId) {
+        const value = document.getElementById(sliderId).value;
+        document.getElementById(outputId).textContent = value;
+    }
+
+    // Body Part Card Interaction
+    const wpiInput = document.getElementById('wpi_hidden');
+    const countDisplay = document.getElementById('pain_area_count');
+    const countInput = document.getElementById('pain_area_count_input');
+
+    document.querySelectorAll('.body-part-card').forEach(card => {
+        card.addEventListener('click', function () {
+            const region = this.getAttribute('data-region');
+            const wpiArr = JSON.parse(wpiInput.value || '[]');
+            const currentlySelected = wpiArr.includes(region);
+
+            let newWPI = [];
+            if (currentlySelected) {
+                newWPI = wpiArr.filter(r => r !== region);
+                this.classList.remove('selected');
+            } else {
+                newWPI = [...wpiArr, region];
+                this.classList.add('selected');
+            }
+
+            wpiInput.value = JSON.stringify(newWPI);
+            countDisplay.textContent = newWPI.length;
+            countInput.value = newWPI.length;
+        });
+    });
+
+    // Form Submission
+    document.getElementById('daily-entry-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const getVal = (id) => document.getElementById(id).value;
+        const getRadio = (name) => {
+            const el = document.querySelector(`input[name="${name}"]:checked`);
+            return el ? el.value : null;
+        };
+
+        const formData = {
+            entry_date: getVal('entry_date'),
+            pain_score: getVal('pain_score'),
+            fatigue_score: getVal('fatigue_score'),
+            sleep_quality: getVal('sleep_quality'),
+            cognitive_difficulty: getVal('cognitive_difficulty'),
+            stress_score: getVal('stress_score'),
+            physical_activity_level: getRadio('physical_activity_level'),
+            sleep_duration_category: getRadio('sleep_duration_category'),
+            weather_sensitivity_bool: getRadio('weather_sensitivity_bool') === '1',
+            sensory_sensitivity_score: getVal('sensory_sensitivity_score'),
+            recent_infection: getRadio('recent_infection') === '1',
+            menstrual_phase: getVal('menstrual_phase'),
+            pain_area_count: getVal('pain_area_count_input'),
+            wpi: JSON.parse(document.getElementById('wpi_hidden').value || '[]')
+        };
+
+        try {
+            const response = await fetch('/api/daily-entry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Daily entry saved successfully!');
+                window.location.href = '/dashboard-page';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('An error occurred while saving.');
+        }
+    });
+
+    // Initialize
+    updateTabUI();
+</script>
+
+{% endblock %}

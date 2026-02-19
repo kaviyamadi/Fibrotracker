@@ -1,0 +1,1124 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Mental Health Assessment{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Styles adapted for consistency with weekly.html and base theme */
+    :root {
+        --primary-blue: #1e40af;
+        --primary-blue-light: #3b82f6;
+        --secondary-teal: #0d9488;
+        --accent-green: #10b981;
+        --success: #059669;
+        --warning: #f59e0b;
+        --error: #dc2626;
+        --info: #3b82f6;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--gray-900);
+    }
+
+    .page-header p {
+        font-size: 1.1rem;
+        color: var(--gray-600);
+    }
+
+    .nav-tabs {
+        display: flex;
+        gap: 0.5rem;
+        background: var(--gray-100);
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 2rem;
+    }
+
+    .nav-tab {
+        flex: 1;
+        padding: 1rem;
+        background: transparent;
+        border: none;
+        border-radius: var(--radius);
+        color: var(--gray-600);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .nav-tab:hover {
+        background: var(--gray-200);
+    }
+
+    .nav-tab.active {
+        background: white;
+        color: var(--primary-blue);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card {
+        background: white;
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+        color: var(--gray-600);
+        font-size: 1rem;
+    }
+
+    .notice {
+        display: flex;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: rgba(59, 130, 246, 0.08);
+        border-left: 4px solid var(--info);
+        border-radius: var(--radius);
+        margin-bottom: 2rem;
+    }
+
+    .notice i {
+        font-size: 1.5rem;
+        color: var(--info);
+        margin-top: 0.25rem;
+    }
+
+    .timeframe-notice {
+        text-align: center;
+        padding: 1rem;
+        background: var(--gray-50);
+        border: 2px dashed var(--gray-300);
+        border-radius: var(--radius);
+        margin-bottom: 2rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .scale-legend {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: var(--radius);
+    }
+
+    .legend-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+    }
+
+    .legend-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+    }
+
+    .legend-label {
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        margin-top: 0.25rem;
+    }
+
+    .questions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .question-item {
+        background: var(--gray-50);
+        padding: 1.25rem;
+        border-radius: var(--radius);
+        border-left: 4px solid var(--primary-blue);
+    }
+
+    .question-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .question-number {
+        display: inline-flex;
+        width: 32px;
+        height: 32px;
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .question-text {
+        flex: 1;
+        color: var(--gray-900);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    .response-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+    }
+
+    .response-option {
+        cursor: pointer;
+    }
+
+    .response-option input[type="radio"] {
+        display: none;
+    }
+
+    .response-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0.5rem;
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        transition: var(--transition-fast);
+        text-align: center;
+    }
+
+    .response-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-500);
+        margin-bottom: 0.25rem;
+    }
+
+    .response-label {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        line-height: 1.3;
+    }
+
+    .response-option:hover .response-content {
+        border-color: var(--primary-blue);
+        background: rgba(30, 64, 175, 0.05);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .response-option input[type="radio"]:checked+.response-content {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+        box-shadow: var(--shadow-md);
+    }
+
+    .response-option input[type="radio"]:checked+.response-content .response-number {
+        color: white;
+    }
+
+    .response-option input[type="radio"]:checked+.response-content .response-label {
+        color: white;
+        font-weight: 600;
+    }
+
+    .difficulty-question {
+        background: var(--gray-50);
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        margin-top: 2rem;
+    }
+
+    .difficulty-question h4 {
+        color: var(--gray-900);
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    .difficulty-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+    }
+
+    .difficulty-option {
+        cursor: pointer;
+    }
+
+    .difficulty-option input[type="radio"] {
+        display: none;
+    }
+
+    .difficulty-content {
+        padding: 1rem;
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        text-align: center;
+        font-size: 0.9rem;
+        transition: var(--transition-fast);
+        color: var(--gray-700);
+    }
+
+    .difficulty-option:hover .difficulty-content {
+        border-color: var(--primary-blue);
+        background: rgba(30, 64, 175, 0.05);
+    }
+
+    .difficulty-option input[type="radio"]:checked+.difficulty-content {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+        font-weight: 600;
+    }
+
+    .score-card {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(124, 58, 237, 0.05));
+        border-radius: var(--radius-md);
+        margin-top: 2rem;
+    }
+
+    .score-summary {
+        text-align: center;
+    }
+
+    .score-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+    }
+
+    .score-value {
+        font-size: 4rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .score-interpretation {
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border-radius: var(--radius);
+        margin-top: 1rem;
+        text-align: center;
+        border: 1px solid var(--gray-200);
+    }
+
+    .score-interpretation.minimal {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        border: 2px solid var(--success);
+    }
+
+    .score-interpretation.mild {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+        border: 2px solid #d97706;
+    }
+
+    .score-interpretation.moderate {
+        background: rgba(249, 115, 22, 0.1);
+        color: #ea580c;
+        border: 2px solid #ea580c;
+    }
+
+    .score-interpretation.moderately-severe,
+    .score-interpretation.severe {
+        background: rgba(220, 38, 38, 0.1);
+        color: var(--error);
+        border: 2px solid var(--error);
+    }
+
+    .score-guide {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .score-guide h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--gray-900);
+    }
+
+    .score-guide ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .score-guide li {
+        padding: 0.5rem 0;
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .score-guide li:last-child {
+        border-bottom: none;
+    }
+
+    .severity-minimal {
+        color: var(--success);
+    }
+
+    .severity-mild {
+        color: #d97706;
+    }
+
+    .severity-moderate {
+        color: #ea580c;
+    }
+
+    .severity-severe {
+        color: var(--error);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .nav-tabs {
+            flex-direction: column;
+        }
+
+        .scale-legend {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .response-options {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .difficulty-options {
+            grid-template-columns: 1fr;
+        }
+
+        .score-card {
+            grid-template-columns: 1fr;
+        }
+
+        .score-value {
+            font-size: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if not is_unlocked %}
+    <div class="lock-overlay"
+        style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg);">
+        <i class="fas fa-lock" style="font-size: 4rem; color: var(--gray-300); margin-bottom: 1.5rem;"></i>
+        <h2 style="margin-bottom: 1rem;">Monthly Assessment Locked</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            This assessment becomes available once you have tracked your symptoms for at least 30 days.
+        </p>
+        <div class="progress-container" style="max-width: 400px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+                <span>Progress</span>
+                <span>{{ days_logged }} / 30 Days</span>
+            </div>
+            <div style="background: var(--gray-200); height: 12px; border-radius: 6px; overflow: hidden;">
+                <div
+                    style="background: var(--primary-blue); height: 100%; width: {{ (days_logged / 30 * 100)|round|int }}%; transition: width 0.3s ease;">
+                </div>
+            </div>
+        </div>
+        <a href="{{ url_for('daily_entry_page') }}" class="btn btn-primary" style="margin-top: 2rem;">
+            <i class="fas fa-calendar-plus"></i> Go to Daily Entry
+        </a>
+    </div>
+    {% else %}
+    <div class="page-header">
+        <h1><i class="fas fa-brain"></i> Monthly Mental Health Assessment</h1>
+        <p>PHQ-9 Depression & GAD-7 Anxiety Screening</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab(1)">
+            <i class="fas fa-heart-broken"></i> PHQ-9 (Depression)
+        </button>
+        <button class="nav-tab" onclick="switchTab(2)">
+            <i class="fas fa-head-side-virus"></i> GAD-7 (Anxiety)
+        </button>
+    </div>
+
+    <!-- Tab 1: PHQ-9 -->
+    <div class="tab-content active" id="tab-1">
+        <div class="card">
+            <div class="section-header">
+                <h2><i class="fas fa-heart-broken"></i> Patient Health Questionnaire-9 (PHQ-9)</h2>
+                <p class="section-subtitle">Depression Severity Assessment</p>
+            </div>
+
+            <div class="notice">
+                <i class="fas fa-info-circle"></i>
+                <p>The PHQ-9 is a validated tool for screening and monitoring depression severity. It's widely used in
+                    clinical practice and correlates with functional impairment.</p>
+            </div>
+
+            <div class="timeframe-notice">
+                <i class="fas fa-calendar"></i> Over the <strong>last 2 weeks</strong>, how often have you been bothered
+                by any of the following problems?
+            </div>
+
+            <div class="scale-legend">
+                <div class="legend-item">
+                    <div class="legend-number">0</div>
+                    <div class="legend-label">Not at all</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-number">1</div>
+                    <div class="legend-label">Several days</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-number">2</div>
+                    <div class="legend-label">More than half the days</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-number">3</div>
+                    <div class="legend-label">Nearly every day</div>
+                </div>
+            </div>
+
+            <form id="phq9-form">
+                <div class="questions-list">
+                    <!-- Question 1 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">1</span>
+                            <div class="question-text">Little interest or pleasure in doing things</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q1" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">2</span>
+                            <div class="question-text">Feeling down, depressed, or hopeless</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q2" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">3</span>
+                            <div class="question-text">Trouble falling or staying asleep, or sleeping too much</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q3" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">4</span>
+                            <div class="question-text">Feeling tired or having little energy</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q4" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">5</span>
+                            <div class="question-text">Poor appetite or overeating</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q5" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">6</span>
+                            <div class="question-text">Feeling bad about yourself — or that you are a failure or have
+                                let yourself or your family down</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q6" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 7 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">7</span>
+                            <div class="question-text">Trouble concentrating on things, such as reading the newspaper or
+                                watching television</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q7" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 8 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">8</span>
+                            <div class="question-text">Moving or speaking so slowly that other people could have
+                                noticed. Or the opposite — being so fidgety or restless that you have been moving around
+                                a lot more than usual</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q8" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 9 -->
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">9</span>
+                            <div class="question-text">Thoughts that you would be better off dead or of hurting yourself
+                                in some way</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="phq9_q9" value="{{ i }}" data-phq9>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}More than half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Functional Impairment Question -->
+                <div class="difficulty-question">
+                    <h4>If you checked off any problems, how <strong>difficult</strong> have these problems made it for
+                        you to do your work, take care of things at home, or get along with other people?</h4>
+                    <div class="difficulty-options">
+                        {% set difficulties = ['Not difficult at all', 'Somewhat difficult', 'Very difficult',
+                        'Extremely difficult'] %}
+                        {% for d in difficulties %}
+                        <label class="difficulty-option">
+                            <input type="radio" name="phq9_difficulty" value="{{ loop.index0 }}">
+                            <div class="difficulty-content">{{ d }}</div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- PHQ-9 Score Display -->
+                <div class="score-card">
+                    <div class="score-summary">
+                        <div class="score-label">PHQ-9 Total Score</div>
+                        <div class="score-value" id="phq9-score">--</div>
+                        <div class="score-interpretation" id="phq9-interpretation">
+                            Answer all questions to calculate
+                        </div>
+                    </div>
+                    <div class="score-guide">
+                        <h4>Depression Severity:</h4>
+                        <ul>
+                            <li><strong class="severity-minimal">0-4:</strong> Minimal depression</li>
+                            <li><strong class="severity-mild">5-9:</strong> Mild depression</li>
+                            <li><strong class="severity-moderate">10-14:</strong> Moderate depression</li>
+                            <li><strong style="color: #ea580c;">15-19:</strong> Moderately severe depression</li>
+                            <li><strong class="severity-severe">20-27:</strong> Severe depression</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                            <strong>⚠️ If Q9 > 0:</strong> Consider suicide risk assessment
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab 2: GAD-7 -->
+    <div class="tab-content" id="tab-2">
+        <div class="card">
+            <div class="section-header">
+                <h2><i class="fas fa-head-side-virus"></i> Generalized Anxiety Disorder-7 (GAD-7)</h2>
+                <p class="section-subtitle">Anxiety Severity Assessment</p>
+            </div>
+
+            <div class="notice">
+                <i class="fas fa-info-circle"></i>
+                <p>The GAD-7 is a validated screening tool for generalized anxiety disorder. It's brief, reliable, and
+                    widely used in primary care and mental health settings.</p>
+            </div>
+
+            <div class="timeframe-notice">
+                <i class="fas fa-calendar"></i> Over the <strong>last 2 weeks</strong>, how often have you been bothered
+                by the following problems?
+            </div>
+
+            <div class="scale-legend">
+                <div class="legend-item">
+                    <div class="legend-number">0</div>
+                    <div class="legend-label">Not at all sure</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-number">1</div>
+                    <div class="legend-label">Several days</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-number">2</div>
+                    <div class="legend-label">Over half the days</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-number">3</div>
+                    <div class="legend-label">Nearly every day</div>
+                </div>
+            </div>
+
+            <form id="gad7-form">
+                <div class="questions-list">
+                    {% set gad7_questions = [
+                    'Feeling nervous, anxious, or on edge',
+                    'Not being able to stop or control worrying',
+                    'Worrying too much about different things',
+                    'Trouble relaxing',
+                    'Being so restless that it\'s hard to sit still',
+                    'Becoming easily annoyed or irritable',
+                    'Feeling afraid as if something awful might happen'
+                    ] %}
+
+                    {% for q in gad7_questions %}
+                    {% set q_idx = loop.index %}
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">{{ q_idx }}</span>
+                            <div class="question-text">{{ q }}</div>
+                        </div>
+                        <div class="response-options">
+                            {% for i in range(4) %}
+                            <label class="response-option">
+                                <input type="radio" name="gad7_q{{ q_idx }}" value="{{ i }}" data-gad7>
+                                <div class="response-content">
+                                    <div class="response-number">{{ i }}</div>
+                                    <div class="response-label">{% if i == 0 %}Not at all{% elif i == 1 %}Several days{%
+                                        elif i == 2 %}Over half{% else %}Nearly every day{% endif %}</div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Functional Impairment Question -->
+                <div class="difficulty-question">
+                    <h4>If you checked off any problems, how <strong>difficult</strong> have these made it for you to do
+                        your work, take care of things at home, or get along with other people?</h4>
+                    <div class="difficulty-options">
+                        {% set difficulties = ['Not difficult at all', 'Somewhat difficult', 'Very difficult',
+                        'Extremely difficult'] %}
+                        {% for d in difficulties %}
+                        <label class="difficulty-option">
+                            <input type="radio" name="gad7_difficulty" value="{{ loop.index0 }}">
+                            <div class="difficulty-content">{{ d }}</div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- GAD-7 Score Display -->
+                <div class="score-card">
+                    <div class="score-summary">
+                        <div class="score-label">GAD-7 Total Score</div>
+                        <div class="score-value" id="gad7-score">--</div>
+                        <div class="score-interpretation" id="gad7-interpretation">
+                            Answer all questions to calculate
+                        </div>
+                    </div>
+                    <div class="score-guide">
+                        <h4>Anxiety Severity:</h4>
+                        <ul>
+                            <li><strong class="severity-minimal">0-4:</strong> Minimal anxiety</li>
+                            <li><strong class="severity-mild">5-9:</strong> Mild anxiety</li>
+                            <li><strong class="severity-moderate">10-14:</strong> Moderate anxiety</li>
+                            <li><strong class="severity-severe">15-21:</strong> Severe anxiety</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                            <strong>Note:</strong> Score ≥10 warrants further evaluation
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button class="btn btn-secondary" onclick="resetAllForms()">
+            <i class="fas fa-redo"></i> Reset All Forms
+        </button>
+        <button class="btn btn-success" onclick="showAllResults()">
+            <i class="fas fa-chart-bar"></i> View Summary
+        </button>
+    </div>
+    <!-- Confirmation Modal and Toast Scripts kept outside the lock check if needed, or inside if they are specific to the unlocked content. 
+         Assuming they are part of the page logic, we close the else block here. -->
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let phq9Score = null;
+    let gad7Score = null;
+
+    // Tab Switching
+    function switchTab(tabNumber) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+        document.getElementById(`tab-${tabNumber}`).classList.add('active');
+        document.querySelectorAll('.nav-tab')[tabNumber - 1].classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        initializePHQ9();
+        initializeGAD7();
+    });
+
+    // PHQ-9 Scoring
+    function initializePHQ9() {
+        document.querySelectorAll('input[data-phq9]').forEach(input => {
+            input.addEventListener('change', calculatePHQ9);
+        });
+    }
+
+    function calculatePHQ9() {
+        let total = 0;
+        let answered = 0;
+
+        for (let i = 1; i <= 9; i++) {
+            const answer = document.querySelector(`input[name="phq9_q${i}"]:checked`);
+            if (answer) {
+                total += parseInt(answer.value);
+                answered++;
+            }
+        }
+
+        if (answered === 9) {
+            phq9Score = total;
+            const scoreDisplay = document.getElementById('phq9-score');
+            const interpretationDisplay = document.getElementById('phq9-interpretation');
+
+            scoreDisplay.textContent = phq9Score;
+
+            let severity = '';
+            let className = '';
+
+            if (phq9Score <= 4) {
+                severity = 'Minimal depression';
+                className = 'minimal';
+            } else if (phq9Score <= 9) {
+                severity = 'Mild depression';
+                className = 'mild';
+            } else if (phq9Score <= 14) {
+                severity = 'Moderate depression';
+                className = 'moderate';
+            } else if (phq9Score <= 19) {
+                severity = 'Moderately severe depression';
+                className = 'moderately-severe';
+            } else {
+                severity = 'Severe depression';
+                className = 'severe';
+            }
+
+            interpretationDisplay.textContent = severity;
+            interpretationDisplay.className = `score-interpretation ${className}`;
+
+            // Check for suicide risk (Q9)
+            const q9Answer = document.querySelector('input[name="phq9_q9"]:checked');
+            if (q9Answer && parseInt(q9Answer.value) > 0) {
+                interpretationDisplay.textContent += ' ⚠️ Suicide risk - Assess immediately';
+            }
+        }
+    }
+
+    // GAD-7 Scoring
+    function initializeGAD7() {
+        document.querySelectorAll('input[data-gad7]').forEach(input => {
+            input.addEventListener('change', calculateGAD7);
+        });
+    }
+
+    function calculateGAD7() {
+        let total = 0;
+        let answered = 0;
+
+        for (let i = 1; i <= 7; i++) {
+            const answer = document.querySelector(`input[name="gad7_q${i}"]:checked`);
+            if (answer) {
+                total += parseInt(answer.value);
+                answered++;
+            }
+        }
+
+        if (answered === 7) {
+            gad7Score = total;
+            const scoreDisplay = document.getElementById('gad7-score');
+            const interpretationDisplay = document.getElementById('gad7-interpretation');
+
+            scoreDisplay.textContent = gad7Score;
+
+            let severity = '';
+            let className = '';
+
+            if (gad7Score <= 4) {
+                severity = 'Minimal anxiety';
+                className = 'minimal';
+            } else if (gad7Score <= 9) {
+                severity = 'Mild anxiety';
+                className = 'mild';
+            } else if (gad7Score <= 14) {
+                severity = 'Moderate anxiety';
+                className = 'moderate';
+            } else {
+                severity = 'Severe anxiety';
+                className = 'severe';
+            }
+
+            interpretationDisplay.textContent = severity;
+            interpretationDisplay.className = `score-interpretation ${className}`;
+        }
+    }
+
+    // Reset all forms
+    function resetAllForms() {
+        if (confirm('Reset all forms? This will clear all your answers.')) {
+            document.getElementById('phq9-form').reset();
+            document.getElementById('gad7-form').reset();
+
+            phq9Score = null;
+            gad7Score = null;
+
+            document.getElementById('phq9-score').textContent = '--';
+            document.getElementById('gad7-score').textContent = '--';
+
+            document.getElementById('phq9-interpretation').textContent = 'Answer all questions to calculate';
+            document.getElementById('gad7-interpretation').textContent = 'Answer all questions to calculate';
+
+            document.getElementById('phq9-interpretation').className = 'score-interpretation';
+            document.getElementById('gad7-interpretation').className = 'score-interpretation';
+        }
+    }
+
+    // Show all results
+    // Submit Monthly Assessment
+    function showAllResults() {
+        if (phq9Score === null || gad7Score === null) {
+            alert("Please complete both assessments before submitting.");
+            return;
+        }
+
+        // Collect detailed data
+        const phq9Data = {};
+        const phq9Inputs = document.querySelectorAll('input[name^="phq9_"]:checked');
+        phq9Inputs.forEach(input => phq9Data[input.name] = parseInt(input.value));
+        const phq9Diff = document.querySelector('input[name="phq9_difficulty"]:checked');
+        if (phq9Diff) phq9Data['phq9_difficulty'] = parseInt(phq9Diff.value);
+
+        const gad7Data = {};
+        const gad7Inputs = document.querySelectorAll('input[name^="gad7_"]:checked');
+        gad7Inputs.forEach(input => gad7Data[input.name] = parseInt(input.value));
+        const gad7Diff = document.querySelector('input[name="gad7_difficulty"]:checked');
+        if (gad7Diff) gad7Data['gad7_difficulty'] = parseInt(gad7Diff.value);
+
+        const payload = {
+            phq9_score: phq9Score,
+            gad7_score: gad7Score,
+            phq9_data: phq9Data,
+            gad7_data: gad7Data,
+            entry_date: new Date().toISOString().split('T')[0]
+        };
+
+        if (confirm("Submit your monthly assessment?")) {
+            fetch('/api/monthly-entry', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Assessment submitted successfully!");
+                        window.location.href = "{{ url_for('dashboard_page') }}";
+                    } else {
+                        alert("Error saving assessment: " + (data.error || "Unknown error"));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("An error occurred while submitting.");
+                });
+        }
+    }
+</script>
+{% endblock %}

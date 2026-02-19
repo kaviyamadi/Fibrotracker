@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep, Stress & Fatigue Assessment Preview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1e40af;
+            --primary-blue-light: #3b82f6;
+            --secondary-teal: #0d9488;
+            --accent-green: #10b981;
+            --success: #059669;
+            --warning: #f59e0b;
+            --error: #dc2626;
+            --info: #3b82f6;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-600);
+            --text-muted: var(--gray-500);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 6px;
+            --radius: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition-fast: all 0.15s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: var(--primary-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .notice {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 4px solid var(--info);
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+        }
+
+        .notice i {
+            font-size: 1.5rem;
+            color: var(--info);
+            margin-top: 0.25rem;
+        }
+
+        .scale-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .scale-section:last-of-type {
+            border-bottom: none;
+        }
+
+        .scale-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--radius);
+            background: var(--white);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .time-input {
+            max-width: 200px;
+        }
+
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 250px;
+        }
+
+        .unit-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-hint {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .help-tooltip {
+            color: var(--gray-400);
+            cursor: help;
+            margin-left: 0.25rem;
+        }
+
+        /* Question Styles */
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .question-item {
+            background: var(--gray-50);
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .question-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 700;
+            margin-right: 0.75rem;
+        }
+
+        .question-text {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* PSS Scale Options */
+        .pss-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .pss-option {
+            cursor: pointer;
+        }
+
+        .pss-option input[type="radio"] {
+            display: none;
+        }
+
+        .pss-option-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem 0.5rem;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition-fast);
+            text-align: center;
+        }
+
+        .pss-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .pss-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .pss-option:hover .pss-option-content {
+            border-color: var(--primary-blue);
+            background: rgba(30, 64, 175, 0.05);
+        }
+
+        .pss-option input[type="radio"]:checked + .pss-option-content {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .pss-option input[type="radio"]:checked + .pss-option-content .pss-number {
+            color: white;
+        }
+
+        .pss-option input[type="radio"]:checked + .pss-option-content .pss-label {
+            color: white;
+        }
+
+        /* FSS Scale Options */
+        .fss-options {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .fss-option {
+            cursor: pointer;
+        }
+
+        .fss-option input[type="radio"] {
+            display: none;
+        }
+
+        .fss-option-content {
+            padding: 0.875rem 0.5rem;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            text-align: center;
+            font-weight: 600;
+            color: var(--gray-600);
+            transition: var(--transition-fast);
+        }
+
+        .fss-option:hover .fss-option-content {
+            border-color: var(--secondary-teal);
+            background: rgba(13, 148, 136, 0.05);
+        }
+
+        .fss-option input[type="radio"]:checked + .fss-option-content {
+            background: var(--secondary-teal);
+            border-color: var(--secondary-teal);
+            color: white;
+        }
+
+        /* PSQI Specific Styles */
+        .psqi-disturbances {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .psqi-question {
+            background: var(--gray-50);
+            padding: 1.25rem;
+            border-radius: var(--radius);
+        }
+
+        .question-label {
+            margin-bottom: 1rem;
+        }
+
+        .question-label strong {
+            color: var(--text-primary);
+        }
+
+        .psqi-frequency-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .frequency-option {
+            display: block;
+            cursor: pointer;
+        }
+
+        .frequency-option input[type="radio"] {
+            display: none;
+        }
+
+        .frequency-option span {
+            display: block;
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            text-align: center;
+            font-size: 0.9rem;
+            transition: var(--transition-fast);
+        }
+
+        .frequency-option:hover span {
+            border-color: var(--primary-blue);
+            background: rgba(30, 64, 175, 0.05);
+        }
+
+        .frequency-option input[type="radio"]:checked + span {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .quality-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .quality-card {
+            cursor: pointer;
+        }
+
+        .quality-card input[type="radio"] {
+            display: none;
+        }
+
+        .quality-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem 1rem;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition-fast);
+        }
+
+        .quality-content i {
+            font-size: 2rem;
+            color: var(--gray-500);
+        }
+
+        .quality-content span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quality-card input[type="radio"]:checked + .quality-content {
+            background: rgba(30, 64, 175, 0.08);
+            border-color: var(--primary-blue);
+        }
+
+        .quality-card input[type="radio"]:checked + .quality-content i {
+            color: var(--primary-blue);
+        }
+
+        .problem-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .problem-option {
+            cursor: pointer;
+        }
+
+        .problem-option input[type="radio"] {
+            display: none;
+        }
+
+        .problem-option span {
+            display: block;
+            padding: 0.875rem 1.25rem;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition-fast);
+        }
+
+        .problem-option:hover span {
+            border-color: var(--primary-blue);
+            background: rgba(30, 64, 175, 0.05);
+        }
+
+        .problem-option input[type="radio"]:checked + span {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        /* Score Cards */
+        .score-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(13, 148, 136, 0.05));
+            border-radius: var(--radius-md);
+            margin-top: 2rem;
+        }
+
+        .score-summary {
+            text-align: center;
+        }
+
+        .score-summary .score-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .score-summary .score-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-interpretation {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: var(--radius);
+        }
+
+        .score-interpretation.good,
+        .score-interpretation.low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .score-interpretation.poor,
+        .score-interpretation.high,
+        .score-interpretation.severe {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+        }
+
+        .score-interpretation.moderate {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .score-guide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .score-guide h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .score-guide ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .score-guide li {
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .pss-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .fss-options {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .psqi-frequency-options {
+                grid-template-columns: 1fr;
+            }
+
+            .quality-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .score-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-clipboard-check"></i> Clinical Assessment Scales</h1>
+            <p>PSQI, PSS-10, and FSS for Fibromyalgia Patients</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab(1)">
+                <i class="fas fa-bed"></i> PSQI
+            </button>
+            <button class="nav-tab" onclick="switchTab(2)">
+                <i class="fas fa-brain"></i> PSS-10
+            </button>
+            <button class="nav-tab" onclick="switchTab(3)">
+                <i class="fas fa-battery-quarter"></i> FSS
+            </button>
+        </div>
+
+        <!-- Tab 1: PSQI -->
+        <div class="tab-content active" id="tab-1">
+            <div class="card">
+                <div class="section-header">
+                    <h2><i class="fas fa-bed"></i> Pittsburgh Sleep Quality Index (PSQI)</h2>
+                </div>
+                <div class="notice">
+                    <i class="fas fa-moon"></i>
+                    <p>The PSQI assesses sleep quality over the past month. A global score >5 indicates poor sleep quality. In fibromyalgia patients, 95% typically score >5.</p>
+                </div>
+
+                <form id="psqi-form">
+                    <!-- Sleep Habits Section (abbreviated for space) -->
+                    <div class="scale-section">
+                        <h3><i class="fas fa-clock"></i> Sleep Habits</h3>
+                        <p class="help-text">Based on your usual sleep habits during the past month</p>
+
+                        <div class="form-group">
+                            <label for="bedtime"><strong>1. What time do you usually go to bed?</strong></label>
+                            <input type="time" id="bedtime" class="form-control time-input" data-psqi>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sleep_latency_minutes"><strong>2. How long to fall asleep (minutes)?</strong></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="sleep_latency_minutes" class="form-control" min="0" max="300" placeholder="30" data-psqi>
+                                <span class="unit-label">minutes</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="waketime"><strong>3. What time do you usually wake up?</strong></label>
+                            <input type="time" id="waketime" class="form-control time-input" data-psqi>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="actual_sleep_hours"><strong>4. Hours of actual sleep per night?</strong></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="actual_sleep_hours" class="form-control" min="0" max="24" step="0.5" placeholder="7.5" data-psqi>
+                                <span class="unit-label">hours</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sleep Quality Rating -->
+                    <div class="scale-section">
+                        <h3><i class="fas fa-star"></i> Overall Sleep Quality</h3>
+                        <div class="form-group">
+                            <label><strong>How would you rate your sleep quality overall?</strong></label>
+                            <div class="quality-options">
+                                <label class="quality-card">
+                                    <input type="radio" name="sleep_quality_rating" value="0" data-psqi>
+                                    <div class="quality-content">
+                                        <i class="fas fa-smile-beam"></i>
+                                        <span>Very Good</span>
+                                    </div>
+                                </label>
+                                <label class="quality-card">
+                                    <input type="radio" name="sleep_quality_rating" value="1" data-psqi>
+                                    <div class="quality-content">
+                                        <i class="fas fa-smile"></i>
+                                        <span>Fairly Good</span>
+                                    </div>
+                                </label>
+                                <label class="quality-card">
+                                    <input type="radio" name="sleep_quality_rating" value="2" data-psqi>
+                                    <div class="quality-content">
+                                        <i class="fas fa-meh"></i>
+                                        <span>Fairly Bad</span>
+                                    </div>
+                                </label>
+                                <label class="quality-card">
+                                    <input type="radio" name="sleep_quality_rating" value="3" data-psqi>
+                                    <div class="quality-content">
+                                        <i class="fas fa-frown"></i>
+                                        <span>Very Bad</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PSQI Score Display -->
+                    <div class="score-card">
+                        <div class="score-summary">
+                            <div class="score-label">PSQI Global Score</div>
+                            <div class="score-value" id="psqi-score">--</div>
+                            <div class="score-interpretation" id="psqi-interpretation">
+                                Complete questions to calculate
+                            </div>
+                        </div>
+                        <div class="score-guide">
+                            <h4>Interpretation:</h4>
+                            <ul>
+                                <li><strong>0-5:</strong> Good sleep quality</li>
+                                <li><strong>6-21:</strong> Poor sleep quality</li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab 2: PSS-10 -->
+        <div class="tab-content" id="tab-2">
+            <div class="card">
+                <div class="section-header">
+                    <h2><i class="fas fa-brain"></i> Perceived Stress Scale (PSS-10)</h2>
+                </div>
+                <div class="notice">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>The PSS-10 measures the degree to which situations in your life are appraised as stressful. Answer based on how often you've felt or thought a certain way in the <strong>last month</strong>.</p>
+                </div>
+
+                <form id="pss-form">
+                    <div class="scale-section">
+                        <div style="text-align: center; margin-bottom: 1.5rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius);">
+                            <strong>Scale:</strong> 0 = Never | 1 = Almost Never | 2 = Sometimes | 3 = Fairly Often | 4 = Very Often
+                        </div>
+
+                        <div class="questions-list">
+                            <!-- Question 1 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">1</span>
+                                    In the last month, how often have you been upset because of something that happened unexpectedly?
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q1" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q1" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q1" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q1" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q1" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 2 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">2</span>
+                                    In the last month, how often have you felt that you were unable to control the important things in your life?
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q2" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q2" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q2" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q2" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q2" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 3 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">3</span>
+                                    In the last month, how often have you felt nervous and "stressed"?
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q3" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q3" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q3" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q3" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q3" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 4 (Reverse Scored) -->
+                            <div class="question-item" style="border-left-color: var(--accent-green);">
+                                <div class="question-text">
+                                    <span class="question-number" style="background: var(--accent-green);">4</span>
+                                    In the last month, how often have you felt confident about your ability to handle your personal problems?
+                                    <small style="color: var(--success); font-weight: 600;">(Reverse scored)</small>
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q4" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q4" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q4" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q4" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q4" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 5 (Reverse Scored) -->
+                            <div class="question-item" style="border-left-color: var(--accent-green);">
+                                <div class="question-text">
+                                    <span class="question-number" style="background: var(--accent-green);">5</span>
+                                    In the last month, how often have you felt that things were going your way?
+                                    <small style="color: var(--success); font-weight: 600;">(Reverse scored)</small>
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q5" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q5" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q5" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q5" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q5" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 6 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">6</span>
+                                    In the last month, how often have you found that you could not cope with all the things that you had to do?
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q6" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q6" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q6" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q6" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q6" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 7 (Reverse Scored) -->
+                            <div class="question-item" style="border-left-color: var(--accent-green);">
+                                <div class="question-text">
+                                    <span class="question-number" style="background: var(--accent-green);">7</span>
+                                    In the last month, how often have you been able to control irritations in your life?
+                                    <small style="color: var(--success); font-weight: 600;">(Reverse scored)</small>
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q7" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q7" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q7" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q7" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q7" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 8 (Reverse Scored) -->
+                            <div class="question-item" style="border-left-color: var(--accent-green);">
+                                <div class="question-text">
+                                    <span class="question-number" style="background: var(--accent-green);">8</span>
+                                    In the last month, how often have you felt that you were on top of things?
+                                    <small style="color: var(--success); font-weight: 600;">(Reverse scored)</small>
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q8" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q8" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q8" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q8" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q8" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 9 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">9</span>
+                                    In the last month, how often have you been angered because of things that were outside of your control?
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q9" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q9" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q9" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q9" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q9" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Question 10 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">10</span>
+                                    In the last month, how often have you felt difficulties were piling up so high that you could not overcome them?
+                                </div>
+                                <div class="pss-options">
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q10" value="0" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">0</div>
+                                            <div class="pss-label">Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q10" value="1" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">1</div>
+                                            <div class="pss-label">Almost Never</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q10" value="2" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">2</div>
+                                            <div class="pss-label">Sometimes</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q10" value="3" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">3</div>
+                                            <div class="pss-label">Fairly Often</div>
+                                        </div>
+                                    </label>
+                                    <label class="pss-option">
+                                        <input type="radio" name="pss_q10" value="4" data-pss>
+                                        <div class="pss-option-content">
+                                            <div class="pss-number">4</div>
+                                            <div class="pss-label">Very Often</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PSS Score Display -->
+                    <div class="score-card">
+                        <div class="score-summary">
+                            <div class="score-label">PSS-10 Total Score</div>
+                            <div class="score-value" id="pss-score">--</div>
+                            <div class="score-interpretation" id="pss-interpretation">
+                                Answer all questions to calculate
+                            </div>
+                        </div>
+                        <div class="score-guide">
+                            <h4>Interpretation:</h4>
+                            <ul>
+                                <li><strong>0-13:</strong> Low stress</li>
+                                <li><strong>14-26:</strong> Moderate stress</li>
+                                <li><strong>27-40:</strong> High perceived stress</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                                <strong>Note:</strong> Questions 4, 5, 7, 8 are reverse scored
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab 3: FSS -->
+        <div class="tab-content" id="tab-3">
+            <div class="card">
+                <div class="section-header">
+                    <h2><i class="fas fa-battery-quarter"></i> Fatigue Severity Scale (FSS)</h2>
+                </div>
+                <div class="notice">
+                    <i class="fas fa-tired"></i>
+                    <p>The FSS is a 9-item scale which measures the severity of fatigue and its effect on activities and lifestyle. Rate each statement on a scale of 1 (Strongly Disagree) to 7 (Strongly Agree).</p>
+                </div>
+
+                <form id="fss-form">
+                    <div class="scale-section">
+                        <div style="text-align: center; margin-bottom: 1.5rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius);">
+                            <strong>During the past week, I have found that:</strong><br>
+                            <span style="font-size: 0.9rem; color: var(--text-secondary);">1 = Strongly Disagree | 4 = Neither Agree/Disagree | 7 = Strongly Agree</span>
+                        </div>
+
+                        <div class="questions-list">
+                            <!-- FSS Question 1 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">1</span>
+                                    My motivation is lower when I am fatigued.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q1" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 2 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">2</span>
+                                    Exercise brings on my fatigue.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q2" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 3 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">3</span>
+                                    I am easily fatigued.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q3" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 4 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">4</span>
+                                    Fatigue interferes with my physical functioning.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q4" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 5 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">5</span>
+                                    Fatigue causes frequent problems for me.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q5" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 6 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">6</span>
+                                    My fatigue prevents sustained physical functioning.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q6" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 7 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">7</span>
+                                    Fatigue interferes with carrying out certain duties and responsibilities.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q7" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 8 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">8</span>
+                                    Fatigue is among my three most disabling symptoms.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q8" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- FSS Question 9 -->
+                            <div class="question-item">
+                                <div class="question-text">
+                                    <span class="question-number">9</span>
+                                    Fatigue interferes with my work, family, or social life.
+                                </div>
+                                <div class="fss-options">
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="1" data-fss>
+                                        <div class="fss-option-content">1</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="2" data-fss>
+                                        <div class="fss-option-content">2</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="3" data-fss>
+                                        <div class="fss-option-content">3</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="4" data-fss>
+                                        <div class="fss-option-content">4</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="5" data-fss>
+                                        <div class="fss-option-content">5</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="6" data-fss>
+                                        <div class="fss-option-content">6</div>
+                                    </label>
+                                    <label class="fss-option">
+                                        <input type="radio" name="fss_q9" value="7" data-fss>
+                                        <div class="fss-option-content">7</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FSS Score Display -->
+                    <div class="score-card">
+                        <div class="score-summary">
+                            <div class="score-label">FSS Mean Score</div>
+                            <div class="score-value" id="fss-score">--</div>
+                            <div class="score-interpretation" id="fss-interpretation">
+                                Answer all questions to calculate
+                            </div>
+                        </div>
+                        <div class="score-guide">
+                            <h4>Interpretation:</h4>
+                            <ul>
+                                <li><strong>< 4.0:</strong> No significant fatigue</li>
+                                <li><strong>4.0-4.9:</strong> Moderate fatigue</li>
+                                <li><strong>≥ 5.0:</strong> Severe fatigue (indicates significant impairment)</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                                Score = Average of 9 items (total sum ÷ 9)
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="resetAllForms()">
+                <i class="fas fa-redo"></i> Reset All Forms
+            </button>
+            <button class="btn btn-success" onclick="showAllResults()">
+                <i class="fas fa-chart-bar"></i> View All Results
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let psqiScore = null;
+        let pssScore = null;
+        let fssScore = null;
+
+        // Tab Switching
+        function switchTab(tabNumber) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(`tab-${tabNumber}`).classList.add('active');
+            document.querySelectorAll('.nav-tab')[tabNumber - 1].classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize all scales
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePSQI();
+            initializePSS();
+            initializeFSS();
+        });
+
+        // PSQI Scoring
+        function initializePSQI() {
+            document.querySelectorAll('input[data-psqi]').forEach(input => {
+                input.addEventListener('change', calculatePSQI);
+                input.addEventListener('input', calculatePSQI);
+            });
+        }
+
+        function calculatePSQI() {
+            const sleepQuality = parseInt(document.querySelector('input[name="sleep_quality_rating"]:checked')?.value || 0);
+            const sleepHours = parseFloat(document.getElementById('actual_sleep_hours')?.value || 0);
+            
+            // Simplified calculation for demo
+            psqiScore = sleepQuality + (sleepHours < 6 ? 3 : 0);
+            
+            const scoreDisplay = document.getElementById('psqi-score');
+            const interpretationDisplay = document.getElementById('psqi-interpretation');
+            
+            if (psqiScore !== null && !isNaN(psqiScore)) {
+                scoreDisplay.textContent = psqiScore;
+                
+                if (psqiScore <= 5) {
+                    interpretationDisplay.textContent = 'Good sleep quality';
+                    interpretationDisplay.className = 'score-interpretation good';
+                } else {
+                    interpretationDisplay.textContent = 'Poor sleep quality - Consider discussing with provider';
+                    interpretationDisplay.className = 'score-interpretation poor';
+                }
+            }
+        }
+
+        // PSS-10 Scoring
+        function initializePSS() {
+            document.querySelectorAll('input[data-pss]').forEach(input => {
+                input.addEventListener('change', calculatePSS);
+            });
+        }
+
+        function calculatePSS() {
+            let total = 0;
+            let answered = 0;
+            
+            for (let i = 1; i <= 10; i++) {
+                const answer = document.querySelector(`input[name="pss_q${i}"]:checked`);
+                if (answer) {
+                    total += parseInt(answer.value);
+                    answered++;
+                }
+            }
+            
+            if (answered === 10) {
+                pssScore = total;
+                const scoreDisplay = document.getElementById('pss-score');
+                const interpretationDisplay = document.getElementById('pss-interpretation');
+                
+                scoreDisplay.textContent = pssScore;
+                
+                if (pssScore <= 13) {
+                    interpretationDisplay.textContent = 'Low stress';
+                    interpretationDisplay.className = 'score-interpretation low';
+                } else if (pssScore <= 26) {
+                    interpretationDisplay.textContent = 'Moderate stress';
+                    interpretationDisplay.className = 'score-interpretation moderate';
+                } else {
+                    interpretationDisplay.textContent = 'High perceived stress';
+                    interpretationDisplay.className = 'score-interpretation high';
+                }
+            }
+        }
+
+        // FSS Scoring
+        function initializeFSS() {
+            document.querySelectorAll('input[data-fss]').forEach(input => {
+                input.addEventListener('change', calculateFSS);
+            });
+        }
+
+        function calculateFSS() {
+            let total = 0;
+            let answered = 0;
+            
+            for (let i = 1; i <= 9; i++) {
+                const answer = document.querySelector(`input[name="fss_q${i}"]:checked`);
+                if (answer) {
+                    total += parseInt(answer.value);
+                    answered++;
+                }
+            }
+            
+            if (answered === 9) {
+                fssScore = (total / 9).toFixed(1);
+                const scoreDisplay = document.getElementById('fss-score');
+                const interpretationDisplay = document.getElementById('fss-interpretation');
+                
+                scoreDisplay.textContent = fssScore;
+                
+                if (fssScore < 4.0) {
+                    interpretationDisplay.textContent = 'No significant fatigue';
+                    interpretationDisplay.className = 'score-interpretation low';
+                } else if (fssScore < 5.0) {
+                    interpretationDisplay.textContent = 'Moderate fatigue';
+                    interpretationDisplay.className = 'score-interpretation moderate';
+                } else {
+                    interpretationDisplay.textContent = 'Severe fatigue - Significant impairment';
+                    interpretationDisplay.className = 'score-interpretation severe';
+                }
+            }
+        }
+
+        // Reset all forms
+        function resetAllForms() {
+            if (confirm('Reset all forms? This will clear all your answers.')) {
+                document.getElementById('psqi-form').reset();
+                document.getElementById('pss-form').reset();
+                document.getElementById('fss-form').reset();
+                
+                psqiScore = null;
+                pssScore = null;
+                fssScore = null;
+                
+                document.getElementById('psqi-score').textContent = '--';
+                document.getElementById('pss-score').textContent = '--';
+                document.getElementById('fss-score').textContent = '--';
+                
+                document.getElementById('psqi-interpretation').textContent = 'Complete questions to calculate';
+                document.getElementById('pss-interpretation').textContent = 'Answer all questions to calculate';
+                document.getElementById('fss-interpretation').textContent = 'Answer all questions to calculate';
+                
+                document.getElementById('psqi-interpretation').className = 'score-interpretation';
+                document.getElementById('pss-interpretation').className = 'score-interpretation';
+                document.getElementById('fss-interpretation').className = 'score-interpretation';
+            }
+        }
+
+        // Show all results
+        function showAllResults() {
+            const results = `
+╔══════════════════════════════════════╗
+║   CLINICAL ASSESSMENT SUMMARY        ║
+╚══════════════════════════════════════╝
+
+📊 PSQI Score: ${psqiScore !== null ? psqiScore : '--'} / 21
+   ${psqiScore !== null ? (psqiScore <= 5 ? '✓ Good sleep quality' : '⚠️ Poor sleep quality') : 'Not completed'}
+
+🧠 PSS-10 Score: ${pssScore !== null ? pssScore : '--'} / 40
+   ${pssScore !== null ? (pssScore <= 13 ? '✓ Low stress' : pssScore <= 26 ? '⚠️ Moderate stress' : '⚠️ High stress') : 'Not completed'}
+
+🔋 FSS Score: ${fssScore !== null ? fssScore : '--'} / 7.0
+   ${fssScore !== null ? (parseFloat(fssScore) < 4.0 ? '✓ No significant fatigue' : parseFloat(fssScore) < 5.0 ? '⚠️ Moderate fatigue' : '⚠️ Severe fatigue') : 'Not completed'}
+
+${(psqiScore !== null || pssScore !== null || fssScore !== null) ? '\n💡 Recommendation: Share these results with your healthcare provider for comprehensive assessment.' : '\n⚠️ Please complete all assessments to view results.'}
+            `;
+            
+            alert(results);
+        }
+    </script>
+</body>
+</html>

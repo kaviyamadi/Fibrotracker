@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FibroTracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    {% if session.get('user_id') %}
+    <!-- Left Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span class="logo-text">FibroTracker</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('home_page') }}" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span class="nav-text">Home</span>
+            </a>
+
+            <a href="{{ url_for('profile_page') }}" class="nav-item">
+                <i class="fas fa-user-circle"></i>
+                <span class="nav-text">Profile</span>
+            </a>
+
+            <a href="{{ url_for('daily_entry_page') }}" class="nav-item">
+                <i class="fas fa-calendar-plus"></i>
+                <span class="nav-text">Daily Entry</span>
+            </a>
+
+            <!-- Weekly Entry -->
+            <a href="{{ url_for('weekly_entry_page') }}" class="nav-item">
+                <i class="fas fa-calendar-week"></i>
+                <span class="nav-text">Weekly Entry</span>
+            </a>
+
+            <!-- Monthly Entry -->
+            <a href="{{ url_for('monthly_entry_page') }}" class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="nav-text">Monthly Entry</span>
+            </a>
+
+            <a href="{{ url_for('dashboard_page') }}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+
+            <a href="{{ url_for('report_page') }}" class="nav-item">
+                <i class="fas fa-file-medical-alt"></i>
+                <span class="nav-text">Reports</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" class="nav-item logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="nav-text">Logout</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper" id="main-wrapper">
+        {% if session.get('user_id') %}
+        <header class="top-header">
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-right">
+                <div class="user-info">
+                    <span class="user-name">{{ session.get('username', 'User') }}</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        {% endif %}
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+        <footer class="main-footer">
+            <div class="footer-links">
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/help">Help</a>
+                <a href="/privacy-policy">Privacy Policy</a>
+            </div>
+            <div class="footer-copy">
+                &copy; <span id="year"></span> FibroTracker. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,710 @@
+{% extends "base.html" %}
+
+{% block title %}Screening - FibroTracker{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding: 20px; margin: 0 auto;">
+
+    <!-- ================= CONSENT & ACCEPTANCE ================= -->
+    <div class="card" id="step0">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-clipboard-check"></i>
+                <h3>Consent & Terms of Use</h3>
+            </div>
+        </div>
+
+        <p class="text-muted">
+            Please read the following information carefully before proceeding with the screening.
+        </p>
+
+        <div
+            style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; max-height: 250px; overflow-y: auto; font-size: 0.95rem; margin-bottom: 1.5rem;">
+            <ul style="padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 8px;">This screening tool is designed for <b>informational and research
+                        purposes only</b>.</li>
+                <li style="margin-bottom: 8px;">It does <b>not provide a medical diagnosis</b> and should not replace
+                    professional medical advice.</li>
+                <li style="margin-bottom: 8px;">The results indicate <b>possible symptom patterns</b> associated with
+                    fibromyalgia.</li>
+                <li style="margin-bottom: 8px;">If you experience severe or persistent symptoms, please consult a
+                    qualified healthcare professional.</li>
+                <li style="margin-bottom: 8px;">Your responses are used solely for screening evaluation and system
+                    improvement.</li>
+                <li>You may stop the screening at any time.</li>
+            </ul>
+        </div>
+
+        <label class="form-check-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="consentCheck" style="width: 18px; height: 18px;">
+            <span style="font-weight: 500;">I have read and understood the above information and voluntarily agree to
+                proceed with the screening.</span>
+        </label>
+
+        <div class="btns" style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+            <button class="btn btn-primary btn-lg" onclick="startScreening()" id="startBtn" disabled>
+                Start Screening <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ================= FiRST TOOL ================= -->
+    <div class="card hidden" id="step1">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-notes-medical"></i>
+                <h3>FiRST - Fibromyalgia Rapid Screening Tool</h3>
+            </div>
+        </div>
+        <p class="text-muted"><b>Instruction:</b> Answer Yes or No to the following questions.</p>
+
+        <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary-color);">Clinical Criteria</h4>
+
+        <div class="question-list">
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">I have pain all over my body.</span>
+                <div style="display: flex; gap: 15px;">
+                    <label><input type="radio" name="f1" value="yes"> Yes</label>
+                    <label><input type="radio" name="f1" value="no"> No</label>
+                </div>
+            </div>
+
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">My pain is accompanied by a continuous and very unpleasant
+                    general fatigue.</span>
+                <div style="display: flex; gap: 15px;">
+                    <label><input type="radio" name="f2" value="yes"> Yes</label>
+                    <label><input type="radio" name="f2" value="no"> No</label>
+                </div>
+            </div>
+
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">My pain feels like burns, electric shocks, or cramps.</span>
+                <div style="display: flex; gap: 15px;">
+                    <label><input type="radio" name="f3" value="yes"> Yes</label>
+                    <label><input type="radio" name="f3" value="no"> No</label>
+                </div>
+            </div>
+
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">My pain is accompanied by other unusual sensations
+                    throughout my body, such as pins and needles,
+                    tingling, or numbness.</span>
+                <div style="display: flex; gap: 15px;">
+                    <label><input type="radio" name="f4" value="yes"> Yes</label>
+                    <label><input type="radio" name="f4" value="no"> No</label>
+                </div>
+            </div>
+
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">My pain is accompanied by other health problems such as
+                    digestive problems, urinary problems,
+                    headaches, or restless legs.</span>
+                <div style="display: flex; gap: 15px;">
+                    <label><input type="radio" name="f5" value="yes"> Yes</label>
+                    <label><input type="radio" name="f5" value="no"> No</label>
+                </div>
+            </div>
+
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">My pain has a significant impact on my life, particularly on
+                    my sleep and my ability to
+                    concentrate, making me feel slower in general.</span>
+                <div style="display: flex; gap: 15px;">
+                    <label><input type="radio" name="f6" value="yes"> Yes</label>
+                    <label><input type="radio" name="f6" value="no"> No</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="btns" style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+            <button class="btn btn-primary" onclick="nextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= Step 2: WPI ================= -->
+    <div class="card hidden" id="step2">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-procedures"></i>
+                <h3>Primary Symptoms: Pain Locations</h3>
+            </div>
+        </div>
+
+        <div
+            style="background: #fff; padding: 25px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+            <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                <div
+                    style="background: var(--primary-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px;">
+                    1</div>
+                <div>
+                    <h4 style="color: var(--primary-color); margin: 0;">Widespread Pain Index (WPI)</h4>
+                    <p class="text-muted" style="margin: 4px 0 0 0; font-size: 0.9rem;">Check all areas where you have
+                        had pain in the last week.</p>
+                </div>
+            </div>
+
+            <!-- CSS Grid for WPI Regions -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <!-- Region 1: Left Upper -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <h5
+                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Left Upper Region (1)</h5>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L jaw" style="width: 16px; height: 16px; margin-right: 10px;"> Jaw (Left)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L shoulder girdle" style="width: 16px; height: 16px; margin-right: 10px;">
+                            Shoulder Girdle (Left)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L upper arm" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Arm
+                            (Left)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L lower arm" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Arm
+                            (Left)</label>
+                    </div>
+                </div>
+                <!-- Region 2: Right Upper -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <h5
+                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Right Upper Region (2)</h5>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R jaw" style="width: 16px; height: 16px; margin-right: 10px;"> Jaw
+                            (Right)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R shoulder girdle" style="width: 16px; height: 16px; margin-right: 10px;">
+                            Shoulder Girdle (Right)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R upper arm" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Arm
+                            (Right)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R lower arm" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Arm
+                            (Right)</label>
+                    </div>
+                </div>
+                <!-- Region 5: Axial -->
+                <div
+                    style="background: #eef2ff; padding: 15px; border-radius: 8px; border: 1px solid #d0d7de; grid-row: span 2;">
+                    <h5
+                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #a5b4fc; padding-bottom: 8px;">
+                        Axial Region (5)</h5>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="Neck" style="width: 16px; height: 16px; margin-right: 10px;"> Neck</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="Upper back" style="width: 16px; height: 16px; margin-right: 10px;"> Upper
+                            Back</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="Lower back" style="width: 16px; height: 16px; margin-right: 10px;"> Lower
+                            Back</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="Chest" style="width: 16px; height: 16px; margin-right: 10px;"> Chest</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="Abdomen" style="width: 16px; height: 16px; margin-right: 10px;"> Abdomen</label>
+                    </div>
+                </div>
+                <!-- Region 3: Left Lower -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <h5
+                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Left Lower Region (3)</h5>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L hip" style="width: 16px; height: 16px; margin-right: 10px;"> Hip / Buttock
+                            (Left)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L upper leg" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Leg
+                            (Left)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="L lower leg" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Leg
+                            (Left)</label>
+                    </div>
+                </div>
+                <!-- Region 4: Right Lower -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <h5
+                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Right Lower Region (4)</h5>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R hip" style="width: 16px; height: 16px; margin-right: 10px;"> Hip / Buttock
+                            (Right)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R upper leg" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Leg
+                            (Right)</label>
+                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
+                                value="R lower leg" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Leg
+                            (Right)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <button class="btn btn-outline" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= Step 3: SSS & Persistence ================= -->
+    <div class="card hidden" id="step3">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-notes-medical"></i>
+                <h3>Symptom Severity & Duration</h3>
+            </div>
+        </div>
+
+        <!-- SSS Part A -->
+        <div style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 2rem;">
+            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">2. Symptom Severity Score (SSS) - Part A</h4>
+            <p class="text-muted">For each of the following, for the past week, rate:</p>
+            <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Symptom</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">0 <br><small style="color: #666;">No
+                            problem</small></th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">1 <br><small
+                            style="color: #666;">Slight</small></th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">2 <br><small
+                            style="color: #666;">Moderate</small></th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">3 <br><small
+                            style="color: #666;">Severe</small></th>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Fatigue</td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="0"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="1"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="2"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="3"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Waking unrefreshed</td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="0"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="1"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="2"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="3"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Cognitive symptoms</td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="0"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="1"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="2"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="3"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SSS Part B -->
+        <div style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 2rem;">
+            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">2. Symptom Severity Score (SSS) - Part B</h4>
+            <p class="text-muted">In the past week, have you been bothered by any of the following?</p>
+            <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Symptom</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">0 = No Problem</th>
+                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">1 = Problem</th>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Headaches</td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="headache" value="0"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="headache" value="1"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Pain or cramps in lower
+                        abdomen</td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="abdomenPain" value="0"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="abdomenPain" value="1"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Depression</td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="depression" value="0"></td>
+                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="depression" value="1"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Persistence -->
+        <div style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">3. Symptom Duration</h4>
+            <p class="text-muted">Have your symptoms (pain, fatigue, etc.) been present for at least 3 months?</p>
+            <div style="margin-top: 10px;">
+                <label style="margin-right: 20px;"><input type="radio" name="duration_4_weeks" value="yes"> Yes, more
+                    than 3 months</label>
+                <label><input type="radio" name="duration_4_weeks" value="no"> No, less than 3 months</label>
+            </div>
+        </div>
+
+        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <button class="btn btn-outline" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= Step 4: Secondary Symptoms ================= -->
+    <div class="card hidden" id="step4">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                <h3>Secondary Symptom Screening</h3>
+            </div>
+        </div>
+        <p class="text-muted"><b>Instruction:</b> Select all symptoms that apply to you.</p>
+
+        <div class="question-list" style="margin-top: 1.5rem;">
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_headache" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you frequently experience headaches or migraines?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_paresthesia" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience tingling or numbness sensations (paresthesia)?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_allodynia" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience pain from normally non-painful stimuli
+                    (allodynia)?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_ibs" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience digestive issues such as IBS?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_depression" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you often experience feelings of depression or low mood?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_sweating" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience excessive or abnormal sweating?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_sensitivity" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Are you sensitive to light, sound, or noise?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_menstrual" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience significant menstrual pain? (Females)</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_stiffness" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience morning stiffness?</span>
+            </label>
+            <label class="checkbox-row"
+                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                <input type="checkbox" name="secondary_jaw" style="width: 18px; height: 18px;">
+                <span style="margin-left: 10px;">Do you experience jaw pain or TMJ discomfort?</span>
+            </label>
+        </div>
+
+        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <button class="btn btn-outline" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" onclick="nextStep(4)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= Step 5: Risk Factors ================= -->
+    <div class="card hidden" id="step5">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Risk Factor Assessment</h3>
+            </div>
+        </div>
+        <p class="text-muted"><b>Instruction:</b> These questions help assess known FM risk factors.</p>
+
+        <div class="question-list" style="margin-top: 1.5rem;">
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Do you have a family history of chronic pain or
+                    fibromyalgia?</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r1" value="yes">
+                        Yes</label><label><input type="radio" name="r1" value="no"> No</label></div>
+            </div>
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Do you have any coexisting medical conditions?</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r2" value="yes">
+                        Yes</label><label><input type="radio" name="r2" value="no"> No</label></div>
+            </div>
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Have you experienced emotional or physical trauma in the
+                    past?</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r3" value="yes">
+                        Yes</label><label><input type="radio" name="r3" value="no"> No</label></div>
+            </div>
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Have you been diagnosed with PTSD?</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r4" value="yes">
+                        Yes</label><label><input type="radio" name="r4" value="no"> No</label></div>
+            </div>
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Do you experience anxiety or depression?</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r5" value="yes">
+                        Yes</label><label><input type="radio" name="r5" value="no"> No</label></div>
+            </div>
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Would you describe your lifestyle as physically
+                    inactive?</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r6" value="yes">
+                        Yes</label><label><input type="radio" name="r6" value="no"> No</label></div>
+            </div>
+            <div class="question-row"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span style="flex: 1; padding-right: 15px;">Sex:</span>
+                <div style="display: flex; gap: 15px;"><label><input type="radio" name="sex" value="Male">
+                        Male</label><label><input type="radio" name="sex" value="Female"> Female</label></div>
+            </div>
+        </div>
+
+        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <button class="btn btn-outline" onclick="prevStep(5)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-success" onclick="completeScreening()"><i class="fas fa-check"></i> Complete
+                Screening</button>
+        </div>
+    </div>
+
+
+    <!-- ================= RESULT ================= -->
+    <div class="card hidden" id="step5">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                <h3>Screening Result</h3>
+            </div>
+        </div>
+
+        <div class="result-box" id="loadingBox" style="text-align: center; padding: 40px;">
+            <div class="spinner-border text-primary" role="status"
+                style="width: 3rem; height: 3rem; margin-bottom: 1rem;">
+                <span class="sr-only">Processing...</span>
+            </div>
+            <h4>Calculating Results...</h4>
+            <p class="text-muted">Please wait while we process your answers.</p>
+        </div>
+
+        <div id="resultContent" class="hidden" style="text-align: center; padding: 20px;">
+            <div id="eligibleIcon" class="hidden">
+                <i class="fas fa-check-circle text-success" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                <h3 class="text-success">You are Eligible for the Study</h3>
+                <p>Your symptoms meet the criteria for participation.</p>
+            </div>
+            <div id="notEligibleIcon" class="hidden">
+                <i class="fas fa-times-circle text-secondary" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                <h3 class="text-secondary">Screening Completed</h3>
+                <p>Based on your responses, you do not meet the primary eligibility criteria at this time.</p>
+            </div>
+
+            <div
+                style="margin-top: 2rem; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left; display: inline-block;">
+                <p><strong>Risk Level:</strong> <span id="resRisk"></span></p>
+                <p><strong>WPI Score:</strong> <span id="resWPI"></span></p>
+                <p><strong>SSS Score:</strong> <span id="resSSS"></span></p>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <a href="/profile-page" class="btn btn-primary btn-lg">Continue to Profile</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /* ---------- INITIAL STATE ---------- */
+    document.addEventListener("DOMContentLoaded", function () {
+        // Show ONLY consent page on load
+        hideAllSteps();
+        document.getElementById("step0").classList.remove("hidden");
+
+        // Disable start button initially
+        document.getElementById("startBtn").disabled = true;
+    });
+
+    /* ---------- CONSENT CHECK ---------- */
+    document.getElementById("consentCheck").addEventListener("change", function () {
+        document.getElementById("startBtn").disabled = !this.checked;
+    });
+
+    /* ---------- START SCREENING ---------- */
+    function startScreening() {
+        hideAllSteps();
+        document.getElementById("step1").classList.remove("hidden"); // FiRST tool
+    }
+
+    /* ---------- STEP NAVIGATION ---------- */
+    function nextStep(n) {
+        hideAllSteps();
+        document.getElementById("step" + (n + 1)).classList.remove("hidden");
+        window.scrollTo(0, 0);
+    }
+
+    function prevStep(n) {
+        hideAllSteps();
+        document.getElementById("step" + (n - 1)).classList.remove("hidden");
+        window.scrollTo(0, 0);
+    }
+
+    /* ---------- COMPLETE ---------- */
+    function completeScreening() {
+        // Show loading state
+        hideAllSteps();
+        const step5 = document.getElementById("step5");
+        step5.classList.remove("hidden");
+        document.getElementById("loadingBox").classList.remove("hidden");
+        document.getElementById("resultContent").classList.add("hidden");
+
+        // 1. Collect FiRST data
+        const first = {};
+        for (let i = 1; i <= 6; i++) {
+            const radios = document.getElementsByName('f' + i);
+            let val = false;
+            // Loop through radios to find checked one
+            for (let r of radios) {
+                if (r.checked && r.value === 'yes') val = true;
+            }
+            first['f' + i] = val;
+        }
+
+        // 2. WPI
+        const wpiCheckboxes = document.querySelectorAll('#step2 input[type="checkbox"]');
+        const wpiRegions = [];
+        wpiCheckboxes.forEach(cb => {
+            if (cb.checked && cb.value) wpiRegions.push(cb.value);
+        });
+
+        // 3. SSS Part A
+        const sss_answers = {
+            fatigue: document.querySelector('input[name="fatigue"]:checked')?.value || 0,
+            sleep: document.querySelector('input[name="sleep"]:checked')?.value || 0,
+            cognitive: document.querySelector('input[name="cog"]:checked')?.value || 0
+        };
+
+        // 4. SSS Part B
+        const sss_somatic = {
+            headache: document.querySelector('input[name="headache"]:checked')?.value || 0,
+            abdomenPain: document.querySelector('input[name="abdomenPain"]:checked')?.value || 0,
+            depression: document.querySelector('input[name="depression"]:checked')?.value || 0
+        };
+
+        // 5. Secondary Symptoms
+        const secCheckboxes = document.querySelectorAll('#step3 input[type="checkbox"]');
+        const secondary_symptoms = [];
+        secCheckboxes.forEach(cb => {
+            if (cb.checked) secondary_symptoms.push(cb.name);
+        });
+
+        // 6. Risk Factors (Step 4)
+        const risk_factors = {};
+        for (let i = 1; i <= 6; i++) {
+            const radios = document.getElementsByName('r' + i);
+            let val = false;
+            // Iterate radios to check if 'yes' is selected
+            for (let r of radios) {
+                if (r.checked && r.value === 'yes') val = true;
+            }
+            risk_factors['r' + i] = val;
+        }
+
+        // Capture Sex if needed for risk factor (though primarily profile)
+        const sexRadio = document.querySelector('input[name="sex"]:checked');
+        if (sexRadio && sexRadio.value === 'Female') {
+            // We can optionally pass this if backend needs it from form
+            risk_factors['sex_female'] = true;
+        }
+
+        // 7. Duration (New)
+        const durationRadio = document.querySelector('input[name="duration_4_weeks"]:checked');
+        const duration_4_weeks = durationRadio ? (durationRadio.value === 'yes') : false;
+
+        // Construct Payload
+        const payload = {
+            first_answers: first,
+            wpi_regions: wpiRegions,
+            sss_answers: sss_answers,
+            sss_somatic: sss_somatic,
+            secondary_symptoms: secondary_symptoms,
+            risk_factors: risk_factors,
+            duration_4_weeks: duration_4_weeks
+        };
+
+        // Send to API
+        fetch('/api/screening', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result) {
+                    // Update UI
+                    document.getElementById("loadingBox").classList.add("hidden");
+                    const resContent = document.getElementById("resultContent");
+                    resContent.classList.remove("hidden");
+
+                    document.getElementById("resRisk").innerText = data.result.risk_level;
+                    document.getElementById("resWPI").innerText = data.result.wpi_score;
+                    document.getElementById("resSSS").innerText = data.result.sss_score;
+
+                    if (data.result.is_eligible) {
+                        document.getElementById("eligibleIcon").classList.remove("hidden");
+                    } else {
+                        document.getElementById("notEligibleIcon").classList.remove("hidden");
+                    }
+
+                    showToast("Screening result saved", "success");
+                } else {
+                    showToast("Error saving result: " + (data.error || 'Unknown error'), "error");
+                    prevStep(5);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast("Network error occurred.", "error");
+                prevStep(5);
+            });
+    }
+
+    /* ---------- HELPER ---------- */
+    function hideAllSteps() {
+        for (let i = 0; i <= 5; i++) {
+            const step = document.getElementById("step" + i);
+            if (step) step.classList.add("hidden");
+        }
+    }
+</script>
+<style>
+    .hidden {
+        display: none !important;
+    }
+
+    .question-row:hover {
+        background-color: #fafafa;
+    }
+</style>
+{% endblock %}

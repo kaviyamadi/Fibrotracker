@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - FibroTracker{% endblock %}
+
+{% block content %}
+<div class="report-page">
+    <h1><i class="fas fa-file-alt"></i> Health Reports</h1>
+
+    <div class="report-section glass">
+        <h2>Weekly Reports</h2>
+        <div class="form-group">
+            <label for="week-selector">Select Week</label>
+            <select id="week-selector">
+                <!-- Populated dynamically -->
+            </select>
+        </div>
+        <div class="button-group">
+            <button onclick="viewWeeklyReport()" class="btn btn-secondary">
+                <i class="fas fa-eye"></i> View Report
+            </button>
+            <button onclick="exportWeeklyExcel()" class="btn btn-primary">
+                <i class="fas fa-file-excel"></i> Export Excel
+            </button>
+            <button onclick="exportWeeklyPDF()" class="btn btn-primary">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+        <div id="weekly-report-display"></div>
+    </div>
+
+    <div class="report-section glass">
+        <h2>Final 3-Month Report</h2>
+        <div class="button-group">
+            <button onclick="viewFinalReport()" class="btn btn-secondary">
+                <i class="fas fa-eye"></i> View Report
+            </button>
+            <button onclick="exportFinalExcel()" class="btn btn-primary">
+                <i class="fas fa-file-excel"></i> Export Excel
+            </button>
+            <button onclick="exportFinalPDF()" class="btn btn-primary">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+        <div id="final-report-display"></div>
+    </div>
+</div>
+
+<script>
+async function loadWeekOptions() {
+    try {
+        const response = await fetch('/api/dashboard/weekly');
+        const data = await response.json();
+        
+        const selector = document.getElementById('week-selector');
+        selector.innerHTML = data.map(w => 
+            `<option value="${w.week_number}">Week ${w.week_number} (${w.week_start} to ${w.week_end})</option>`
+        ).join('');
+    } catch (error) {
+        console.error('Error loading weeks:', error);
+    }
+}
+
+async function viewWeeklyReport() {
+    const weekNumber = document.getElementById('week-selector').value;
+    if (!weekNumber) return;
+    
+    showLoading();
+    try {
+        const response = await fetch(`/api/report/weekly?week_number=${weekNumber}`);
+        const data = await response.json();
+        
+        document.getElementById('weekly-report-display').innerHTML = `
+            <div class="report-card glass">
+                <h3>Week ${data.week_number} Summary</h3>
+                <div class="report-stats">
+                    <div class="stat"><strong>Avg Pain:</strong> ${data.summary.avg_pain}</div>
+                    <div class="stat"><strong>Avg Fatigue:</strong> ${data.summary.avg_fatigue}</div>
+                    <div class="stat"><strong>Avg Sleep:</strong> ${data.summary.avg_sleep}</div>
+                    <div class="stat"><strong>Avg Stress:</strong> ${data.summary.avg_stress}</div>
+                    <div class="stat"><strong>Avg Mood:</strong> ${data.summary.avg_mood}</div>
+                    <div class="stat"><strong>ACR Met:</strong> ${data.summary.acr_met ? 'Yes' : 'No'}</div>
+                </div>
+                <div class="ai-advice">
+                    <h4><i class="fas fa-lightbulb"></i> AI Recommendations</h4>
+                    <p>${data.ai_advice.replace(/\n/g, '<br>')}</p>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        showToast('Error loading report', 'error');
+    }
+    hideLoading();
+}
+
+async function exportWeeklyExcel() {
+    const weekNumber = document.getElementById('week-selector').value;
+    window.location.href = `/api/report/weekly/export-excel?week_number=${weekNumber}`;
+}
+
+async function exportWeeklyPDF() {
+    const weekNumber = document.getElementById('week-selector').value;
+    window.location.href = `/api/report/weekly/export-pdf?week_number=${weekNumber}`;
+}
+
+async function viewFinalReport() {
+    showLoading();
+    try {
+        const response = await fetch('/api/report/final');
+        const data = await response.json();
+        
+        document.getElementById('final-report-display').innerHTML = `
+            <div class="report-card glass">
+                <h3>3-Month Final Report</h3>
+                <div class="report-stats">
+                    <div class="stat"><strong>Avg Pain:</strong> ${data.averages.avg_pain}</div>
+                    <div class="stat"><strong>Avg Fatigue:</strong> ${data.averages.avg_fatigue}</div>
+                    <div class="stat"><strong>Avg Sleep:</strong> ${data.averages.avg_sleep}</div>
+                    <div class="stat"><strong>Avg Stress:</strong> ${data.averages.avg_stress}</div>
+                    <div class="stat"><strong>Avg Mood:</strong> ${data.averages.avg_mood}</div>
+                    <div class="stat"><strong>FIQr Trend:</strong> ${data.fiqr_trend}</div>
+                </div>
+                <div class="ai-advice">
+                    <h4><i class="fas fa-lightbulb"></i> AI Recommendations</h4>
+                    <p>${data.ai_advice.replace(/\n/g, '<br>')}</p>
+                </div>
+                <div class="doctor-rec">
+                    <strong>Doctor Recommendation:</strong> ${data.doctor_recommendation}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        showToast('Error loading final report', 'error');
+    }
+    hideLoading();
+}
+
+async function exportFinalExcel() {
+    window.location.href = '/api/report/final/export-excel';
+}
+
+async function exportFinalPDF() {
+    window.location.href = '/api/report/final/export-pdf';
+}
+
+window.addEventListener('load', loadWeekOptions);
+</script>
+{% endblock %}

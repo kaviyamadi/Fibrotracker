@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - FibroTracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Welcome back, <span id="username">{{ username }}</span></h1>
+</div>
+
+<!-- Fibromyalgia Article Section -->
+<div class="container content-section" style="padding: 2rem 0; line-height: 1.6;">
+    <article>
+        <h1 style="color: var(--primary-color, #2c3e50); margin-bottom: 2rem; font-size: 2rem;">Learn more about
+            Fibromyalgia</h1>
+
+        <section style="margin-bottom: 2.5rem;">
+            <h2 style="color: var(--secondary-color, #34495e); margin-bottom: 1rem;">What is Fibromyalgia?</h2>
+            <p style="margin-bottom: 1rem; color: #555;">Fibromyalgia is a chronic disorder characterized by widespread
+                musculoskeletal pain, accompanied by fatigue, sleep, memory, and mood issues. Researchers believe that
+                fibromyalgia amplifies painful sensations by affecting the way your brain and spinal cord process
+                painful and nonpainful signals.</p>
+        </section>
+
+        <section style="margin-bottom: 2.5rem;">
+            <h2 style="color: var(--secondary-color, #34495e); margin-bottom: 1rem;">Symptoms</h2>
+            <p style="margin-bottom: 1rem; color: #555;">The primary symptoms of fibromyalgia include:</p>
+            <ul style="padding-left: 1.5rem; color: #555;">
+                <li style="margin-bottom: 0.5rem;"><strong>Widespread pain:</strong> The pain associated with
+                    fibromyalgia often is described as a constant dull ache that has lasted for at least three months.
+                    To be considered widespread, the pain must occur on both sides of your body and above and below your
+                    waist.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Fatigue:</strong> People with fibromyalgia often awaken
+                    tired, even though they report sleeping for long periods of time. Sleep is often disrupted by pain,
+                    and many patients with fibromyalgia have other sleep disorders, such as restless legs syndrome and
+                    sleep apnea.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Cognitive difficulties:</strong> A symptom commonly referred
+                    to as "fibro fog" impairs the ability to focus, pay attention and concentrate on mental tasks.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom: 2.5rem;">
+            <h2 style="color: var(--secondary-color, #34495e); margin-bottom: 1rem;">Causes</h2>
+            <p style="margin-bottom: 1rem; color: #555;">Doctors don't know what causes fibromyalgia, but it most likely
+                involves a variety of factors working together. These may include:</p>
+            <ul style="padding-left: 1.5rem; color: #555;">
+                <li style="margin-bottom: 0.5rem;"><strong>Genetics:</strong> Because fibromyalgia tends to run in
+                    families, there may be certain genetic mutations that may make you more susceptible to developing
+                    the disorder.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Infections:</strong> Some illnesses appear to trigger or
+                    aggravate fibromyalgia.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Physical or emotional events:</strong> Fibromyalgia can
+                    sometimes be triggered by a physical trauma, such as a car accident. Prolonged psychological stress
+                    may also trigger the condition.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 style="color: var(--secondary-color, #34495e); margin-bottom: 1rem;">Treatment</h2>
+            <p style="color: #555;">While there is no cure for fibromyalgia, a variety of medications can help control
+                symptoms. Exercise, relaxation and stress-reduction measures also may help.</p>
+        </section>
+    </article>
+</div>
+{% endblock %}

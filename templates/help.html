@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Help & Support - FibroTracker{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding: 2rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>Help & FAQ</h2>
+        </div>
+        <div class="card-body">
+            <h3>Getting Started</h3>
+            <p><strong>How do I log my daily symptoms?</strong></p>
+            <p>Navigate to the "Daily Entry" page from the sidebar. Fill out the pain score, fatigue levels, and other
+                metrics, then click "Save Entry".</p>
+
+            <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--gray-200);">
+
+            <h3>Reports</h3>
+            <p><strong>Can I export my data?</strong></p>
+            <p>Yes, go to the "Reports" page to view your summaries and download PDF reports to share with your doctor.
+            </p>
+
+            <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--gray-200);">
+
+            <h3>Account</h3>
+            <p><strong>How do I change my password?</strong></p>
+            <p>Currently, please contact support to reset your password. A self-service feature is coming soon.</p>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: var(--gray-50); border-radius: 8px;">
+                <p><strong>Still need help?</strong> <a href="{{ url_for('contact_page') }}">Contact Support</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

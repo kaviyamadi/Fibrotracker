@@ -1,0 +1,36 @@
+<svg viewBox="0 0 600 400" id="body-map-svg">
+<text x="150" y="20" text-anchor="middle" font-weight="bold">FRONT</text>
+<circle cx="150" cy="50" r="30" fill="#e0e0e0" />
+<path id="f-jaw-l" data-region="jaw-left" class="body-part" d="M 145 70 125 65 125 50 145 50 z" />
+<path id="f-jaw-r" data-region="jaw-right" class="body-part" d="M 155 70 175 65 175 50 155 50 z" />
+<path id="f-neck" data-region="neck" class="body-part" d="M 135 80 h 30 v 20 h -30 z" />
+<path id="f-chest" data-region="chest" class="body-part" d="M 110 100 h 80 v 50 h -80 z" />
+<path id="f-abdomen" data-region="abdomen" class="body-part" d="M 115 150 h 70 v 60 h -70 z" />
+<path id="f-sh-l" data-region="shoulder-left" class="body-part" d="M 110 100 80 105 85 130 110 125 z" />
+<path id="f-sh-r" data-region="shoulder-right" class="body-part" d="M 190 100 220 105 215 130 190 125 z" />
+<path id="f-ua-l" data-region="upper-arm-left" class="body-part" d="M 80 105 60 110 70 160 85 130 z" />
+<path id="f-ua-r" data-region="upper-arm-right" class="body-part" d="M 220 105 240 110 230 160 215 130 z" />
+<path id="f-la-l" data-region="lower-arm-left" class="body-part" d="M 70 160 60 210 75 215 85 165 z" />
+<path id="f-la-r" data-region="lower-arm-right" class="body-part" d="M 230 160 240 210 225 215 215 165 z" />
+<path id="f-ul-l" data-region="upper-leg-left" class="body-part" d="M 115 210 h 30 v 80 h -30 z" />
+<path id="f-ul-r" data-region="upper-leg-right" class="body-part" d="M 155 210 h 30 v 80 h -30 z" />
+<path id="f-ll-l" data-region="lower-leg-left" class="body-part" d="M 120 290 h 20 v 80 h -20 z" />
+<path id="f-ll-r" data-region="lower-leg-right" class="body-part" d="M 160 290 h 20 v 80 h -20 z" />
+<text x="450" y="20" text-anchor="middle" font-weight="bold">BACK</text>
+<circle cx="450" cy="50" r="30" fill="#e0e0e0" />
+<path id="b-neck" data-region="neck" class="body-part" d="M 435 80 h 30 v 20 h -30 z" />
+<path id="b-ub" data-region="upper-back" class="body-part" d="M 410 100 h 80 v 60 h -80 z" />
+<path id="b-lb" data-region="lower-back" class="body-part" d="M 415 160 h 70 v 50 h -70 z" />
+<path id="b-hip-l" data-region="hip-left" class="body-part" d="M 415 210 h 35 v 40 h -35 z" />
+<path id="b-hip-r" data-region="hip-right" class="body-part" d="M 450 210 h 35 v 40 h -35 z" />
+<path id="b-sh-l" data-region="shoulder-left" class="body-part" d="M 410 100 380 105 385 130 410 125 z" />
+<path id="b-sh-r" data-region="shoulder-right" class="body-part" d="M 490 100 520 105 515 130 490 125 z" />
+<path id="b-ua-l" data-region="upper-arm-left" class="body-part" d="M 380 105 360 110 370 160 385 130 z" />
+<path id="b-ua-r" data-region="upper-arm-right" class="body-part" d="M 520 105 540 110 530 160 515 130 z" />
+<path id="b-la-l" data-region="lower-arm-left" class="body-part" d="M 370 160 360 210 375 215 385 165 z" />
+<path id="b-la-r" data-region="lower-arm-right" class="body-part" d="M 530 160 540 210 525 215 515 165 z" />
+<path id="b-ul-l" data-region="upper-leg-left" class="body-part" d="M 415 250 h 30 v 40 h -30 z" />
+<path id="b-ul-r" data-region="upper-leg-right" class="body-part" d="M 455 250 h 30 v 40 h -30 z" />
+<path id="b-ll-l" data-region="lower-leg-left" class="body-part" d="M 420 290 h 20 v 80 h -20 z" />
+<path id="b-ll-r" data-region="lower-leg-right" class="body-part" d="M 460 290 h 20 v 80 h -20 z" />
+</svg>

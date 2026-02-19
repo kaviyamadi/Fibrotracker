@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Find Doctors - FibroTracker{% endblock %}
+
+{% block extra_head %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcN4HTut5WWjRN0oWH7cL-Nxeyko9WJzg&libraries=places"></script>
+{% endblock %}
+
+{% block content %}
+<div class="doctors-page">
+    <h1><i class="fas fa-stethoscope"></i> Find Nearby Rheumatologists</h1>
+    
+    <div class="location-section glass">
+        <button onclick="getUserLocation()" class="btn btn-primary">
+            <i class="fas fa-map-marker-alt"></i> Use My Location
+        </button>
+        <p id="location-status">Click to detect your location</p>
+    </div>
+
+    <div id="map" class="map-container glass"></div>
+
+    <div id="doctors-list" class="doctors-list">
+        <!-- Populated dynamically -->
+    </div>
+</div>
+
+<script>
+let map, userMarker;
+
+function initMap(lat, lng) {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat, lng },
+        zoom: 13,
+        styles: [
+            { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+            { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+            { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] }
+        ]
+    });
+    
+    userMarker = new google.maps.Marker({
+        position: { lat, lng },
+        map: map,
+        title: 'Your Location',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+    });
+}
+
+async function getUserLocation() {
+    if (!navigator.geolocation) {
+        showToast('Geolocation not supported', 'error');
+        return;
+    }
+    
+    showLoading();
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        document.getElementById('location-status').textContent = `Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        
+        initMap(lat, lng);
+        await findNearbyDoctors(lat, lng);
+        hideLoading();
+    }, (error) => {
+        hideLoading();
+        showToast('Unable to get location', 'error');
+    });
+}
+
+async function findNearbyDoctors(lat, lng) {
+    try {
+        const response = await fetch(`/api/nearby-doctors?lat=${lat}&lng=${lng}&radius=5000`);
+        const data = await response.json();
+        
+        if (response.ok && data.doctors) {
+            displayDoctors(data.doctors);
+        } else {
+            showToast('No doctors found nearby', 'info');
+        }
+    } catch (error) {
+        showToast('Error fetching doctors', 'error');
+    }
+}
+
+function displayDoctors(doctors) {
+    const container = document.getElementById('doctors-list');
+    
+    if (doctors.length === 0) {
+        container.innerHTML = '<p>No rheumatologists found in your area.</p>';
+        return;
+    }
+    
+    container.innerHTML = doctors.map(doc => `
+        <div class="doctor-card glass">
+            <div class="doctor-icon"><i class="fas fa-user-md"></i></div>
+            <div class="doctor-info">
+                <h3>${doc.name}</h3>
+                <p><i class="fas fa-map-marker-alt"></i> ${doc.address}</p>
+                <p><i class="fas fa-star"></i> Rating: ${doc.rating || 'N/A'}</p>
+            </div>
+            <button onclick="showOnMap(${doc.location.lat}, ${doc.location.lng})" class="btn btn-secondary">
+                <i class="fas fa-map"></i> Show on Map
+            </button>
+        </div>
+    `).join('');
+    
+    // Add markers
+    doctors.forEach(doc => {
+        new google.maps.Marker({
+            position: doc.location,
+            map: map,
+            title: doc.name
+        });
+    });
+}
+
+function showOnMap(lat, lng) {
+    map.setCenter({ lat, lng });
+    map.setZoom(15);
+}
+</script>
+{% endblock %}

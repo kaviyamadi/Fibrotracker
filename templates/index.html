@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FibroTracker - Professional Health Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="landing-body">
+
+    <!-- Centered Navbar -->
+    <nav class="landing-nav">
+        <div class="nav-container" style="justify-content: center;">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>FibroTracker</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">Professional Fibromyalgia Management</h1>
+                <p class="hero-subtitle">
+                    Track symptoms and manage your health with confidence.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('register_page') }}" class="btn btn-primary-large">
+                        <i class="fas fa-user-plus"></i> Get Started Free
+                    </a>
+                    <a href="{{ url_for('login_page') }}" class="btn btn-secondary-large">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section (No button) -->
+    <section class="cta">
+        <div class="cta-container">
+            <h2>Start Your Health Journey Today</h2>
+            <p>Join thousands of users managing fibromyalgia effectively</p>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <p>&copy; 2025 FibroTracker. All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+
+</html>

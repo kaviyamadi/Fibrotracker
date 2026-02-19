@@ -1,0 +1,11 @@
+Flask
+Werkzeug
+Flask-Cors
+numpy
+pandas
+scikit-learn
+joblib
+requests
+reportlab
+google-generativeai
+xlsxwriter
