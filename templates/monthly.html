@@ -926,6 +926,18 @@
     let phq9Score = null;
     let gad7Score = null;
 
+    // Data collection
+    let phq9FormData = {}; // Renamed to avoid conflict with global phq9Data in snippet
+    let gad7FormData = {}; // Renamed to avoid conflict with global gad7Data in snippet
+
+    // Time Tracking
+    let questionTimings = {
+        phq9: {},
+        gad7: {}
+    };
+    let activeTabStartTime = Date.now();
+    let lastActionTime = null;
+
     // Tab Switching
     function switchTab(tabNumber) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -935,12 +947,37 @@
         document.querySelectorAll('.nav-tab')[tabNumber - 1].classList.add('active');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Reset timer base for new section
+        activeTabStartTime = Date.now();
+        lastActionTime = null;
     }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function () {
         initializePHQ9();
         initializeGAD7();
+
+        // Attach listeners to all radio buttons for timing
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const name = e.target.name;
+                const section = name.startsWith('phq9') ? 'phq9' : 'gad7';
+
+                const now = Date.now();
+                const qKeyMatch = name.match(/(phq9|gad7)_q(\d+)/);
+                if (qKeyMatch) {
+                    const qNum = qKeyMatch[2];
+                    const timeKey = 'time' + qNum;
+
+                    let spent = (now - (lastActionTime || activeTabStartTime)) / 1000;
+
+                    // Store
+                    questionTimings[section][timeKey] = spent;
+                    lastActionTime = now;
+                }
+            });
+        });
     });
 
     // PHQ-9 Scoring
@@ -1092,8 +1129,8 @@
         const payload = {
             phq9_score: phq9Score,
             gad7_score: gad7Score,
-            phq9_data: phq9Data,
-            gad7_data: gad7Data,
+            phq9_data: { ...phq9Data, times: questionTimings.phq9 },
+            gad7_data: { ...gad7Data, times: questionTimings.gad7 },
             entry_date: new Date().toISOString().split('T')[0]
         };
 
