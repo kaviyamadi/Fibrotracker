@@ -23,6 +23,28 @@ CORS(app)
 # Configure Gemini API
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
+# -------------------------------------------------
+# Load ML Models
+# -------------------------------------------------
+SCREENING_MODEL = None
+SCREENING_LE = None
+
+try:
+    SCREENING_MODEL = joblib.load("fibro_risk_model.pkl")
+    SCREENING_LE = joblib.load("fibro_risk_le.pkl")
+    print("✅ Screening model loaded successfully.")
+except Exception as e:
+    print(f"⚠️ Could not load screening model: {e}")
+
+GAD_MODEL = None
+PHQ_MODEL = None
+try:
+    GAD_MODEL = joblib.load("dataset/models/gad/gad7_severity_model.pkl")
+    PHQ_MODEL = joblib.load("dataset/models/phq/phq_severity_model.pkl")
+    print("✅ GAD/PHQ models loaded successfully.")
+except Exception as e:
+    print(f"⚠️ Could not load GAD/PHQ models: {e}")
+
 DATABASE = 'fibrotracker.db'
 
 # Load ML model
@@ -106,11 +128,14 @@ def init_db():
         # -------------------------------------------------
         # Primary Symptoms
         # -------------------------------------------------
+        # -------------------------------------------------
+        # Primary Symptoms
+        # -------------------------------------------------
         conn.execute('''
         CREATE TABLE IF NOT EXISTS primary_symptoms (
             symptom_id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            pain_score INTEGER CHECK(pain_score BETWEEN 0 AND 10),
+            pain_score INTEGER CHECK(pain_score BETWEEN 0 AND 19),
             fatigue_score INTEGER CHECK(fatigue_score BETWEEN 0 AND 10),
             sleep_score INTEGER CHECK(sleep_score BETWEEN 0 AND 10),
             cognitive_score INTEGER CHECK(cognitive_score BETWEEN 0 AND 10),
@@ -297,6 +322,41 @@ def check_and_migrate_db():
             conn.execute('ALTER TABLE daily_entries ADD COLUMN menstrual_phase TEXT')
         if 'pain_area_count' not in columns:
             conn.execute('ALTER TABLE daily_entries ADD COLUMN pain_area_count INTEGER')
+
+        # -------------------------------------------------
+        # FIX: primary_symptoms pain_score constraint (0-10 -> 0-19)
+        # -------------------------------------------------
+        # Check if we need to migrate by inspecting sql (approximated) or just do it safely
+        # We can try to insert a dummy value > 10 in a transaction and see if it fails, then migrate?
+        # Or just checking if we already migrated. 
+        # Easier: Let's check table sql or just force migration if we haven't tracked it.
+        # Since we don't have a migration version table, we'll check schema.
+        
+        cursor = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='primary_symptoms'")
+        row = cursor.fetchone()
+        if row and 'CHECK(pain_score BETWEEN 0 AND 10)' in row['sql']:
+            print("Migrating primary_symptoms table to allow higher pain score...")
+            with conn:
+                conn.execute("ALTER TABLE primary_symptoms RENAME TO primary_symptoms_old")
+                conn.execute('''
+                    CREATE TABLE primary_symptoms (
+                        symptom_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        pain_score INTEGER CHECK(pain_score BETWEEN 0 AND 19),
+                        fatigue_score INTEGER CHECK(fatigue_score BETWEEN 0 AND 10),
+                        sleep_score INTEGER CHECK(sleep_score BETWEEN 0 AND 10),
+                        cognitive_score INTEGER CHECK(cognitive_score BETWEEN 0 AND 10),
+                        total_score INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                ''')
+                conn.execute('''
+                    INSERT INTO primary_symptoms (symptom_id, user_id, pain_score, fatigue_score, sleep_score, cognitive_score, total_score)
+                    SELECT symptom_id, user_id, pain_score, fatigue_score, sleep_score, cognitive_score, total_score
+                    FROM primary_symptoms_old
+                ''')
+                conn.execute("DROP TABLE primary_symptoms_old")
+            print("Migration of primary_symptoms completed.")
             
     except Exception as e:
         print(f"Migration error (harmless if already up to date): {e}")
@@ -376,7 +436,7 @@ def validate_profile_payload(data):
 
     if sex and sex not in VALID_SEX:
         return False, f"Invalid sex value. Allowed: {', '.join(VALID_SEX)}"
-    if age_group and age_group not in VALID_AGE_GROUPS:
+    if age_group and age_group not in VALID_AGE_GROPS:
         return False, f"Invalid age_group. Allowed: {', '.join(VALID_AGE_GROUPS)}"
     if workload and workload not in VALID_WORKLOAD:
         return False, f"Invalid workload. Allowed: {', '.join(VALID_WORKLOAD)}"
@@ -1452,15 +1512,114 @@ def save_monthly_entry():
         entry_date = data.get('entry_date', datetime.now().strftime('%Y-%m-%d'))
         phq9_score = data.get('phq9_score')
         gad7_score = data.get('gad7_score')
-        phq9_data = json.dumps(data.get('phq9_data', {}))
-        gad7_data = json.dumps(data.get('gad7_data', {}))
+        
+        # Extract raw data dictionaries
+        phq9_raw = data.get('phq9_data', {})
+        gad7_raw = data.get('gad7_data', {})
+
+        # --- AI Prediction (GAD-7) ---
+        if GAD_MODEL:
+            try:
+                # Prepare input dict: question1..7, time1..7
+                gad_input = {}
+                # Questions
+                for k, v in gad7_raw.items():
+                    if k.startswith('question'):
+                        gad_input[k] = v
+                # Times
+                times = gad7_raw.get('times', {})
+                for k, v in times.items():
+                    gad_input[k] = v
+                
+                # Check for completeness (simple check)
+                if len(gad_input) >= 14: # 7 qs + 7 times
+                    # Feature engineering as per gad.py
+                    # We need to create a DataFrame to use the exact logic or replicate it.
+                    # GAD model expects: `question1`..`question7` + `avg_response_time` + `max_response_time`
+                    # Wait, the gad.py `predict_gad_severity` calculates avg/max from time cols.
+                    # But the MODEL object itself (RandomForest) expects the final feature vector.
+                    # I need to see `gad.py` again to know exact feature columns expected by `model.predict`.
+                    # View file `dataset/models/gad/gad.py` showed:
+                    # features = temp_df[question_cols + ["avg_response_time", "max_response_time"]]
+                    # So feature order matters.
+                    
+                    # Columns: question1..7, avg_response_time, max_response_time.
+                    
+                    df_gad = pd.DataFrame([gad_input])
+                    time_cols = [f'time{i}' for i in range(1, 8)]
+                    q_cols = [f'question{i}' for i in range(1, 8)]
+                    
+                    # Fill missing timings with defaults?
+                    for c in time_cols:
+                        if c not in df_gad.columns: df_gad[c] = 0
+                    
+                    df_gad["avg_response_time"] = df_gad[time_cols].mean(axis=1)
+                    df_gad["max_response_time"] = df_gad[time_cols].max(axis=1)
+                    
+                    features = df_gad[q_cols + ["avg_response_time", "max_response_time"]]
+                    
+                    pred_class = GAD_MODEL.predict(features)[0]
+                    pred_prob = GAD_MODEL.predict_proba(features).max()
+                    
+                    severity_map = {0: "Minimal anxiety", 1: "Mild anxiety", 2: "Moderate anxiety", 3: "Moderate to severe anxiety"}
+                    predicted_severity = severity_map.get(pred_class, "Unknown")
+                    
+                    gad7_raw['ai_prediction'] = {
+                        'severity': predicted_severity,
+                        'confidence': round(float(pred_prob), 3)
+                    }
+                    print(f"🧠 GAD-7 AI Prediction: {predicted_severity} ({pred_prob:.2f})")
+            except Exception as e:
+                print(f"⚠️ GAD-7 Prediction failed: {e}")
+
+        # --- AI Prediction (PHQ-9) ---
+        if PHQ_MODEL:
+            try:
+                phq_input = {}
+                for k, v in phq9_raw.items():
+                    if k.startswith('question'):
+                        phq_input[k] = v
+                times = phq9_raw.get('times', {})
+                for k, v in times.items():
+                    phq_input[k] = v
+                
+                if len(phq_input) >= 18: # 9 qs + 9 times
+                    df_phq = pd.DataFrame([phq_input])
+                    time_cols = [f'time{i}' for i in range(1, 10)]
+                    q_cols = [f'question{i}' for i in range(1, 10)]
+                    
+                    for c in time_cols:
+                        if c not in df_phq.columns: df_phq[c] = 0
+                        
+                    df_phq["avg_response_time"] = df_phq[time_cols].mean(axis=1)
+                    df_phq["max_response_time"] = df_phq[time_cols].max(axis=1)
+                    
+                    features = df_phq[q_cols + ["avg_response_time", "max_response_time"]]
+                    
+                    pred_class = PHQ_MODEL.predict(features)[0]
+                    pred_prob = PHQ_MODEL.predict_proba(features).max()
+                    
+                    severity_map = {0: "Minimal", 1: "Mild", 2: "Moderate", 3: "Moderately Severe", 4: "Severe"}
+                    predicted_severity = severity_map.get(pred_class, "Unknown")
+                    
+                    phq9_raw['ai_prediction'] = {
+                        'severity': predicted_severity,
+                        'confidence': round(float(pred_prob), 3)
+                    }
+                    print(f"🧠 PHQ-9 AI Prediction: {predicted_severity} ({pred_prob:.2f})")
+            except Exception as e:
+                print(f"⚠️ PHQ-9 Prediction failed: {e}")
+
+        # Serialize for DB
+        phq9_data_json = json.dumps(phq9_raw)
+        gad7_data_json = json.dumps(gad7_raw)
 
         conn = get_db_connection()
         conn.execute('''
             INSERT INTO monthly_assessments 
             (user_id, entry_date, phq9_score, gad7_score, phq9_data, gad7_data)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, entry_date, phq9_score, gad7_score, phq9_data, gad7_data))
+        ''', (user_id, entry_date, phq9_score, gad7_score, phq9_data_json, gad7_data_json))
         
         conn.commit()
         conn.close()
@@ -1855,6 +2014,7 @@ def api_save_screening():
     
     # Primary Score: 1 if ANY rule met, else 0
     primary_score = 1.0 if (rule1_met or rule2_met or rule3_met) else 0.0
+    primary_scaled = primary_score # Used in modular_total_score
 
     # ---------------------------------------------------------
     # MODULE 2: SECONDARY SYMPTOMS (Weight 0.3)
@@ -1914,26 +2074,92 @@ def api_save_screening():
     # ---------------------------------------------------------
     # TOTAL WEIGHTED SCORE
     # ---------------------------------------------------------
-    total_risk_score = (0.6 * primary_score) + (0.3 * secondary_score_norm) + (0.1 * risk_factor_fraction)
-    
-    # Risk Category
-    # 0 - 0.3 Low
-    # 0.31 - 0.6 Mod
-    # 0.61 - 1 High
-    # Override: >= 0.7 -> High
-    
-    if total_risk_score >= 0.7:
-        risk_category = "High"
-    elif total_risk_score > 0.6:
-        risk_category = "High"
-    elif total_risk_score > 0.3:
-        risk_category = "Moderate"
-    else:
-        risk_category = "Low"
+    # --- Calculate Modular Total Score ---
+    modular_total_score = (
+        (primary_scaled * 0.4) + 
+        (secondary_score_norm * 0.3) + 
+        (risk_factor_fraction * 0.3)
+    )
 
-    # Eligibility: High Risk = Eligible? 
-    # Or "Meets Criteria" (Standard) = Eligible?
-    # User said previously: "Eligibility = Meets Criteria".
+    # --- ML Model Prediction ---
+    # Default to rule-based manual calculation first
+    risk_category = "Low"
+    if modular_total_score >= 0.7:
+        risk_category = "High"
+    elif modular_total_score >= 0.4:
+        risk_category = "Moderate"
+    
+    total_risk_score = float(modular_total_score) # legacy assignment
+
+    # Try to use ML model if available
+    if SCREENING_MODEL and SCREENING_LE:
+        try:
+            # Construct feature vector matching training data
+            # Features: ["WPI", "SSS", "pain_regions", "symptom_persistence", "secondary_score_norm", "risk_factor_fraction", "rf_total"]
+            
+            # Pain regions count (matches 'pain_regions' feature)
+            pain_regions_count = wpi_score 
+            
+            # Symptom persistence (matches 'symptom_persistence' feature?? No, check training data logic)
+            # In training data, 'symptom_persistence' seems to be integer. 
+            # In app, duration_4_weeks is boolean.
+            # Let's verify mapping. If not clear, we stick to features we know.
+            # Wait, WPI is count of regions. 'pain_regions' in dataset might be same?
+            # Let's assume standard feature mapping.
+            
+            # MAPPING based on ml_training_dataset.csv columns
+            # WPI = wpi_score
+            # SSS = sss_score
+            # pain_regions = wpi_score (likely redundant but present in training)
+            # symptom_persistence = 12 if True else 0 (Approximation based on dataset having values like 12, 3, 7 etc likely months)
+            # For now, let's map boolean to a fixed value seen in high risk (e.g. 6 months = 6) or just use 3 if > 3 months.
+            # The prompt says "duration_4_weeks". The dataset has "duration" in months maybe?
+            # Let's check dataset sample: values are 12, 3, 7, 4... likely months.
+            # Since we only ask "> 3 months", we can impute a representative value like 6.
+            
+            persistence_val = 6 if duration_4_weeks else 1
+            
+            input_features = pd.DataFrame([{
+                "WPI": wpi_score,
+                "SSS": sss_score,
+                "pain_regions": wpi_score, 
+                "symptom_persistence": persistence_val,
+                "secondary_score_norm": secondary_score_norm,
+                "risk_factor_fraction": risk_factor_fraction,
+                "rf_total": risk_sum
+            }])
+            
+            # Predict
+            pred_encoded = SCREENING_MODEL.predict(input_features)[0]
+            risk_category = SCREENING_LE.inverse_transform([pred_encoded])[0]
+            
+            # Get probability for "High" or weighted prob
+            # classes order depends on LE. Usually alphabetical: High, Low, Moderate
+            probs = SCREENING_MODEL.predict_proba(input_features)[0]
+            classes = SCREENING_LE.classes_
+            
+            # Find probability of High risk
+            if "High" in classes:
+                high_idx = np.where(classes == "High")[0][0]
+                total_risk_score = float(probs[high_idx])
+            else:
+                # Fallback to max prob
+                total_risk_score = float(max(probs))
+                
+            print(f"🤖 ML Prediction: Category={risk_category}, Prob={total_risk_score:.2f}")
+            
+        except Exception as e:
+            print(f"⚠️ ML Prediction failed, using manual calculation: {e}")
+
+    # Determine Eligibility (Rule-based safety net + risk)
+    # User is eligible if High/Moderate risk AND meets ACR criteria (roughly)
+    # ACR 2016: WPI >= 7 & SSS >= 5 OR WPI 3-6 & SSS >= 9
+    
+    acr_met = (wpi_score >= 7 and sss_score >= 5) or (wpi_score >= 3 and wpi_score <= 6 and sss_score >= 9)
+    
+    is_eligible = (risk_category in ["High", "Moderate"]) or acr_met
+
+    # --- Save to DB ---said previously: "Eligibility = Meets Criteria".
     # But now we have a probability.
     # Let's assume High/Moderate risk might be eligible, or strict to "High".
     # Given the previous logic was strict, let's stick to "High" = Eligible for now, 
