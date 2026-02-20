@@ -3,532 +3,423 @@
 {% block title %}Screening - FibroTracker{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 900px; padding: 20px; margin: 0 auto;">
+<div class="container screening-container">
 
-    <!-- ================= CONSENT & ACCEPTANCE ================= -->
-    <div class="card" id="step0">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-clipboard-check"></i>
-                <h3>Consent & Terms of Use</h3>
-            </div>
+    <!-- ========== PROGRESS BAR ========== -->
+    <div class="screening-progress" id="progressBar">
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
         </div>
+        <div class="progress-steps">
+            <div class="progress-step active" data-step="0"><span>1</span><small>Consent</small></div>
+            <div class="progress-step" data-step="1"><span>2</span><small>FiRST</small></div>
+            <div class="progress-step" data-step="2"><span>3</span><small>Pain</small></div>
+            <div class="progress-step" data-step="3"><span>4</span><small>Severity</small></div>
+            <div class="progress-step" data-step="4"><span>5</span><small>Secondary</small></div>
+            <div class="progress-step" data-step="5"><span>6</span><small>Risk</small></div>
+        </div>
+    </div>
 
-        <p class="text-muted">
-            Please read the following information carefully before proceeding with the screening.
-        </p>
+    <!-- ================= CONSENT ================= -->
+    <div class="screening-card" id="step0">
+        <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
+        <h3>Consent & Terms of Use</h3>
+        <p class="card-subtitle">Please read the following information carefully before proceeding.</p>
 
-        <div
-            style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; max-height: 250px; overflow-y: auto; font-size: 0.95rem; margin-bottom: 1.5rem;">
-            <ul style="padding-left: 20px; margin: 0;">
-                <li style="margin-bottom: 8px;">This screening tool is designed for <b>informational and research
-                        purposes only</b>.</li>
-                <li style="margin-bottom: 8px;">It does <b>not provide a medical diagnosis</b> and should not replace
-                    professional medical advice.</li>
-                <li style="margin-bottom: 8px;">The results indicate <b>possible symptom patterns</b> associated with
-                    fibromyalgia.</li>
-                <li style="margin-bottom: 8px;">If you experience severe or persistent symptoms, please consult a
-                    qualified healthcare professional.</li>
-                <li style="margin-bottom: 8px;">Your responses are used solely for screening evaluation and system
-                    improvement.</li>
+        <div class="consent-box">
+            <ul>
+                <li>This screening tool is designed for <b>informational and research purposes only</b>.</li>
+                <li>It does <b>not provide a medical diagnosis</b> and should not replace professional medical advice.
+                </li>
+                <li>The results indicate <b>possible symptom patterns</b> associated with fibromyalgia.</li>
+                <li>If you experience severe or persistent symptoms, please consult a qualified healthcare professional.
+                </li>
+                <li>Your responses are used solely for screening evaluation and system improvement.</li>
                 <li>You may stop the screening at any time.</li>
             </ul>
         </div>
 
-        <label class="form-check-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <input type="checkbox" id="consentCheck" style="width: 18px; height: 18px;">
-            <span style="font-weight: 500;">I have read and understood the above information and voluntarily agree to
-                proceed with the screening.</span>
+        <label class="consent-label">
+            <input type="checkbox" id="consentCheck">
+            <span class="custom-check"><i class="fas fa-check"></i></span>
+            <span>I have read and understood the above information and voluntarily agree to proceed.</span>
         </label>
 
-        <div class="btns" style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+        <div class="btns">
             <button class="btn btn-primary btn-lg" onclick="startScreening()" id="startBtn" disabled>
                 Start Screening <i class="fas fa-arrow-right ml-2"></i>
             </button>
         </div>
     </div>
 
-
     <!-- ================= FiRST TOOL ================= -->
-    <div class="card hidden" id="step1">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-notes-medical"></i>
-                <h3>FiRST - Fibromyalgia Rapid Screening Tool</h3>
-            </div>
-        </div>
-        <p class="text-muted"><b>Instruction:</b> Answer Yes or No to the following questions.</p>
-
-        <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary-color);">Clinical Criteria</h4>
+    <div class="screening-card hidden" id="step1">
+        <div class="card-icon"><i class="fas fa-notes-medical"></i></div>
+        <h3>FiRST — Fibromyalgia Rapid Screening Tool</h3>
+        <p class="card-subtitle"><b>Instruction:</b> Answer Yes or No to the following questions.</p>
 
         <div class="question-list">
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">I have pain all over my body.</span>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="f1" value="yes"> Yes</label>
-                    <label><input type="radio" name="f1" value="no"> No</label>
+            <div class="question-card">
+                <span class="q-num">1</span>
+                <span class="q-text">I have pain all over my body.</span>
+                <div class="radio-group">
+                    <label class="radio-pill"><input type="radio" name="f1" value="yes"><span>Yes</span></label>
+                    <label class="radio-pill"><input type="radio" name="f1" value="no"><span>No</span></label>
                 </div>
             </div>
-
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">My pain is accompanied by a continuous and very unpleasant
-                    general fatigue.</span>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="f2" value="yes"> Yes</label>
-                    <label><input type="radio" name="f2" value="no"> No</label>
+            <div class="question-card">
+                <span class="q-num">2</span>
+                <span class="q-text">My pain is accompanied by a continuous and very unpleasant general fatigue.</span>
+                <div class="radio-group">
+                    <label class="radio-pill"><input type="radio" name="f2" value="yes"><span>Yes</span></label>
+                    <label class="radio-pill"><input type="radio" name="f2" value="no"><span>No</span></label>
                 </div>
             </div>
-
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">My pain feels like burns, electric shocks, or cramps.</span>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="f3" value="yes"> Yes</label>
-                    <label><input type="radio" name="f3" value="no"> No</label>
+            <div class="question-card">
+                <span class="q-num">3</span>
+                <span class="q-text">My pain feels like burns, electric shocks, or cramps.</span>
+                <div class="radio-group">
+                    <label class="radio-pill"><input type="radio" name="f3" value="yes"><span>Yes</span></label>
+                    <label class="radio-pill"><input type="radio" name="f3" value="no"><span>No</span></label>
                 </div>
             </div>
-
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">My pain is accompanied by other unusual sensations
-                    throughout my body, such as pins and needles,
+            <div class="question-card">
+                <span class="q-num">4</span>
+                <span class="q-text">My pain is accompanied by other unusual sensations such as pins and needles,
                     tingling, or numbness.</span>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="f4" value="yes"> Yes</label>
-                    <label><input type="radio" name="f4" value="no"> No</label>
+                <div class="radio-group">
+                    <label class="radio-pill"><input type="radio" name="f4" value="yes"><span>Yes</span></label>
+                    <label class="radio-pill"><input type="radio" name="f4" value="no"><span>No</span></label>
                 </div>
             </div>
-
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">My pain is accompanied by other health problems such as
-                    digestive problems, urinary problems,
-                    headaches, or restless legs.</span>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="f5" value="yes"> Yes</label>
-                    <label><input type="radio" name="f5" value="no"> No</label>
+            <div class="question-card">
+                <span class="q-num">5</span>
+                <span class="q-text">My pain is accompanied by other health problems such as digestive problems, urinary
+                    problems, headaches, or restless legs.</span>
+                <div class="radio-group">
+                    <label class="radio-pill"><input type="radio" name="f5" value="yes"><span>Yes</span></label>
+                    <label class="radio-pill"><input type="radio" name="f5" value="no"><span>No</span></label>
                 </div>
             </div>
-
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">My pain has a significant impact on my life, particularly on
-                    my sleep and my ability to
-                    concentrate, making me feel slower in general.</span>
-                <div style="display: flex; gap: 15px;">
-                    <label><input type="radio" name="f6" value="yes"> Yes</label>
-                    <label><input type="radio" name="f6" value="no"> No</label>
+            <div class="question-card">
+                <span class="q-num">6</span>
+                <span class="q-text">My pain has a significant impact on my life, particularly on my sleep and my
+                    ability to concentrate.</span>
+                <div class="radio-group">
+                    <label class="radio-pill"><input type="radio" name="f6" value="yes"><span>Yes</span></label>
+                    <label class="radio-pill"><input type="radio" name="f6" value="no"><span>No</span></label>
                 </div>
             </div>
         </div>
 
-        <div class="btns" style="display: flex; justify-content: flex-end; margin-top: 2rem;">
-            <button class="btn btn-primary" onclick="nextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
-        </div>
+        <div class="btns"><button class="btn btn-primary" onclick="nextStep(1)">Next <i
+                    class="fas fa-arrow-right"></i></button></div>
     </div>
 
     <!-- ================= Step 2: WPI ================= -->
-    <div class="card hidden" id="step2">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-procedures"></i>
-                <h3>Primary Symptoms: Pain Locations</h3>
+    <div class="screening-card hidden" id="step2">
+        <div class="card-icon"><i class="fas fa-procedures"></i></div>
+        <h3>Primary Symptoms: Pain Locations</h3>
+        <p class="card-subtitle">Check all areas where you have had pain in the last week.</p>
+        <p class="wpi-counter">Selected: <strong id="wpiCount">0</strong> / 19 regions</p>
+
+        <div class="wpi-grid">
+            <div class="region-card">
+                <h5><i class="fas fa-hand-point-up"></i> Left Upper</h5>
+                <label class="check-item"><input type="checkbox" value="L jaw"><span>Jaw (Left)</span></label>
+                <label class="check-item"><input type="checkbox" value="L shoulder girdle"><span>Shoulder Girdle
+                        (Left)</span></label>
+                <label class="check-item"><input type="checkbox" value="L upper arm"><span>Upper Arm
+                        (Left)</span></label>
+                <label class="check-item"><input type="checkbox" value="L lower arm"><span>Lower Arm
+                        (Left)</span></label>
+            </div>
+            <div class="region-card">
+                <h5><i class="fas fa-hand-point-up"></i> Right Upper</h5>
+                <label class="check-item"><input type="checkbox" value="R jaw"><span>Jaw (Right)</span></label>
+                <label class="check-item"><input type="checkbox" value="R shoulder girdle"><span>Shoulder Girdle
+                        (Right)</span></label>
+                <label class="check-item"><input type="checkbox" value="R upper arm"><span>Upper Arm
+                        (Right)</span></label>
+                <label class="check-item"><input type="checkbox" value="R lower arm"><span>Lower Arm
+                        (Right)</span></label>
+            </div>
+            <div class="region-card accent">
+                <h5><i class="fas fa-bone"></i> Axial</h5>
+                <label class="check-item"><input type="checkbox" value="Neck"><span>Neck</span></label>
+                <label class="check-item"><input type="checkbox" value="Upper back"><span>Upper Back</span></label>
+                <label class="check-item"><input type="checkbox" value="Lower back"><span>Lower Back</span></label>
+                <label class="check-item"><input type="checkbox" value="Chest"><span>Chest</span></label>
+                <label class="check-item"><input type="checkbox" value="Abdomen"><span>Abdomen</span></label>
+            </div>
+            <div class="region-card">
+                <h5><i class="fas fa-shoe-prints"></i> Left Lower</h5>
+                <label class="check-item"><input type="checkbox" value="L hip"><span>Hip / Buttock (Left)</span></label>
+                <label class="check-item"><input type="checkbox" value="L upper leg"><span>Upper Leg
+                        (Left)</span></label>
+                <label class="check-item"><input type="checkbox" value="L lower leg"><span>Lower Leg
+                        (Left)</span></label>
+            </div>
+            <div class="region-card">
+                <h5><i class="fas fa-shoe-prints"></i> Right Lower</h5>
+                <label class="check-item"><input type="checkbox" value="R hip"><span>Hip / Buttock
+                        (Right)</span></label>
+                <label class="check-item"><input type="checkbox" value="R upper leg"><span>Upper Leg
+                        (Right)</span></label>
+                <label class="check-item"><input type="checkbox" value="R lower leg"><span>Lower Leg
+                        (Right)</span></label>
             </div>
         </div>
 
-        <div
-            style="background: #fff; padding: 25px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-            <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                <div
-                    style="background: var(--primary-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px;">
-                    1</div>
-                <div>
-                    <h4 style="color: var(--primary-color); margin: 0;">Widespread Pain Index (WPI)</h4>
-                    <p class="text-muted" style="margin: 4px 0 0 0; font-size: 0.9rem;">Check all areas where you have
-                        had pain in the last week.</p>
-                </div>
-            </div>
-
-            <!-- CSS Grid for WPI Regions -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                <!-- Region 1: Left Upper -->
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-                    <h5
-                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
-                        Left Upper Region (1)</h5>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L jaw" style="width: 16px; height: 16px; margin-right: 10px;"> Jaw (Left)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L shoulder girdle" style="width: 16px; height: 16px; margin-right: 10px;">
-                            Shoulder Girdle (Left)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L upper arm" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Arm
-                            (Left)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L lower arm" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Arm
-                            (Left)</label>
-                    </div>
-                </div>
-                <!-- Region 2: Right Upper -->
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-                    <h5
-                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
-                        Right Upper Region (2)</h5>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R jaw" style="width: 16px; height: 16px; margin-right: 10px;"> Jaw
-                            (Right)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R shoulder girdle" style="width: 16px; height: 16px; margin-right: 10px;">
-                            Shoulder Girdle (Right)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R upper arm" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Arm
-                            (Right)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R lower arm" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Arm
-                            (Right)</label>
-                    </div>
-                </div>
-                <!-- Region 5: Axial -->
-                <div
-                    style="background: #eef2ff; padding: 15px; border-radius: 8px; border: 1px solid #d0d7de; grid-row: span 2;">
-                    <h5
-                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #a5b4fc; padding-bottom: 8px;">
-                        Axial Region (5)</h5>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="Neck" style="width: 16px; height: 16px; margin-right: 10px;"> Neck</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="Upper back" style="width: 16px; height: 16px; margin-right: 10px;"> Upper
-                            Back</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="Lower back" style="width: 16px; height: 16px; margin-right: 10px;"> Lower
-                            Back</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="Chest" style="width: 16px; height: 16px; margin-right: 10px;"> Chest</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="Abdomen" style="width: 16px; height: 16px; margin-right: 10px;"> Abdomen</label>
-                    </div>
-                </div>
-                <!-- Region 3: Left Lower -->
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-                    <h5
-                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
-                        Left Lower Region (3)</h5>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L hip" style="width: 16px; height: 16px; margin-right: 10px;"> Hip / Buttock
-                            (Left)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L upper leg" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Leg
-                            (Left)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="L lower leg" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Leg
-                            (Left)</label>
-                    </div>
-                </div>
-                <!-- Region 4: Right Lower -->
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-                    <h5
-                        style="margin-bottom: 12px; color: #495057; font-size: 1rem; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
-                        Right Lower Region (4)</h5>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R hip" style="width: 16px; height: 16px; margin-right: 10px;"> Hip / Buttock
-                            (Right)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R upper leg" style="width: 16px; height: 16px; margin-right: 10px;"> Upper Leg
-                            (Right)</label>
-                        <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox"
-                                value="R lower leg" style="width: 16px; height: 16px; margin-right: 10px;"> Lower Leg
-                            (Right)</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+        <div class="btns">
             <button class="btn btn-outline" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Previous</button>
             <button class="btn btn-primary" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
     <!-- ================= Step 3: SSS & Persistence ================= -->
-    <div class="card hidden" id="step3">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-notes-medical"></i>
-                <h3>Symptom Severity & Duration</h3>
-            </div>
-        </div>
+    <div class="screening-card hidden" id="step3">
+        <div class="card-icon"><i class="fas fa-notes-medical"></i></div>
+        <h3>Symptom Severity & Duration</h3>
 
         <!-- SSS Part A -->
-        <div style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 2rem;">
-            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">2. Symptom Severity Score (SSS) - Part A</h4>
-            <p class="text-muted">For each of the following, for the past week, rate:</p>
-            <table style="width: 100%; border-collapse: collapse; text-align: center;">
-                <tr style="background: #f8f9fa;">
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Symptom</th>
-                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">0 <br><small style="color: #666;">No
-                            problem</small></th>
-                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">1 <br><small
-                            style="color: #666;">Slight</small></th>
-                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">2 <br><small
-                            style="color: #666;">Moderate</small></th>
-                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">3 <br><small
-                            style="color: #666;">Severe</small></th>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Fatigue</td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="0"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="1"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="2"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="fatigue" value="3"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Waking unrefreshed</td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="0"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="1"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="2"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="sleep" value="3"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Cognitive symptoms</td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="0"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="1"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="2"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="cog" value="3"></td>
-                </tr>
-            </table>
+        <div class="sub-section">
+            <h4><span class="badge">Part A</span> Symptom Severity Score (SSS)</h4>
+            <p class="card-subtitle">For each symptom, rate your experience over the past week.</p>
+            <div class="severity-grid">
+                <div class="severity-row header">
+                    <span class="sev-label">Symptom</span>
+                    <span class="sev-opt">0<br><small>None</small></span>
+                    <span class="sev-opt">1<br><small>Slight</small></span>
+                    <span class="sev-opt">2<br><small>Moderate</small></span>
+                    <span class="sev-opt">3<br><small>Severe</small></span>
+                </div>
+                <div class="severity-row">
+                    <span class="sev-label"><i class="fas fa-battery-quarter"></i> Fatigue</span>
+                    <label class="sev-opt"><input type="radio" name="fatigue" value="0"><span
+                            class="sev-circle">0</span></label>
+                    <label class="sev-opt"><input type="radio" name="fatigue" value="1"><span
+                            class="sev-circle">1</span></label>
+                    <label class="sev-opt"><input type="radio" name="fatigue" value="2"><span
+                            class="sev-circle">2</span></label>
+                    <label class="sev-opt"><input type="radio" name="fatigue" value="3"><span
+                            class="sev-circle">3</span></label>
+                </div>
+                <div class="severity-row">
+                    <span class="sev-label"><i class="fas fa-bed"></i> Waking Unrefreshed</span>
+                    <label class="sev-opt"><input type="radio" name="sleep" value="0"><span
+                            class="sev-circle">0</span></label>
+                    <label class="sev-opt"><input type="radio" name="sleep" value="1"><span
+                            class="sev-circle">1</span></label>
+                    <label class="sev-opt"><input type="radio" name="sleep" value="2"><span
+                            class="sev-circle">2</span></label>
+                    <label class="sev-opt"><input type="radio" name="sleep" value="3"><span
+                            class="sev-circle">3</span></label>
+                </div>
+                <div class="severity-row">
+                    <span class="sev-label"><i class="fas fa-brain"></i> Cognitive Symptoms</span>
+                    <label class="sev-opt"><input type="radio" name="cog" value="0"><span
+                            class="sev-circle">0</span></label>
+                    <label class="sev-opt"><input type="radio" name="cog" value="1"><span
+                            class="sev-circle">1</span></label>
+                    <label class="sev-opt"><input type="radio" name="cog" value="2"><span
+                            class="sev-circle">2</span></label>
+                    <label class="sev-opt"><input type="radio" name="cog" value="3"><span
+                            class="sev-circle">3</span></label>
+                </div>
+            </div>
         </div>
 
         <!-- SSS Part B -->
-        <div style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 2rem;">
-            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">2. Symptom Severity Score (SSS) - Part B</h4>
-            <p class="text-muted">In the past week, have you been bothered by any of the following?</p>
-            <table style="width: 100%; border-collapse: collapse; text-align: center;">
-                <tr style="background: #f8f9fa;">
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Symptom</th>
-                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">0 = No Problem</th>
-                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">1 = Problem</th>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Headaches</td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="headache" value="0"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="headache" value="1"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Pain or cramps in lower
-                        abdomen</td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="abdomenPain" value="0"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="abdomenPain" value="1"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; text-align: left; border-bottom: 1px solid #eee;">Depression</td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="depression" value="0"></td>
-                    <td style="border-bottom: 1px solid #eee;"><input type="radio" name="depression" value="1"></td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Persistence -->
-        <div style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">3. Symptom Duration</h4>
-            <p class="text-muted">Have your symptoms (pain, fatigue, etc.) been present for at least 3 months?</p>
-            <div style="margin-top: 10px;">
-                <label style="margin-right: 20px;"><input type="radio" name="duration_4_weeks" value="yes"> Yes, more
-                    than 3 months</label>
-                <label><input type="radio" name="duration_4_weeks" value="no"> No, less than 3 months</label>
+        <div class="sub-section">
+            <h4><span class="badge">Part B</span> Somatic Symptoms</h4>
+            <p class="card-subtitle">In the past week, have you been bothered by any of the following?</p>
+            <div class="severity-grid">
+                <div class="severity-row header narrow">
+                    <span class="sev-label">Symptom</span>
+                    <span class="sev-opt">No</span>
+                    <span class="sev-opt">Yes</span>
+                </div>
+                <div class="severity-row narrow">
+                    <span class="sev-label"><i class="fas fa-head-side-virus"></i> Headaches</span>
+                    <label class="sev-opt"><input type="radio" name="headache" value="0"><span
+                            class="sev-circle">No</span></label>
+                    <label class="sev-opt"><input type="radio" name="headache" value="1"><span
+                            class="sev-circle">Yes</span></label>
+                </div>
+                <div class="severity-row narrow">
+                    <span class="sev-label"><i class="fas fa-stomach"></i> Pain / Cramps in Abdomen</span>
+                    <label class="sev-opt"><input type="radio" name="abdomenPain" value="0"><span
+                            class="sev-circle">No</span></label>
+                    <label class="sev-opt"><input type="radio" name="abdomenPain" value="1"><span
+                            class="sev-circle">Yes</span></label>
+                </div>
+                <div class="severity-row narrow">
+                    <span class="sev-label"><i class="fas fa-cloud-rain"></i> Depression</span>
+                    <label class="sev-opt"><input type="radio" name="depression" value="0"><span
+                            class="sev-circle">No</span></label>
+                    <label class="sev-opt"><input type="radio" name="depression" value="1"><span
+                            class="sev-circle">Yes</span></label>
+                </div>
             </div>
         </div>
 
-        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+        <!-- Duration -->
+        <div class="sub-section">
+            <h4><span class="badge">Duration</span> Symptom Persistence</h4>
+            <p class="card-subtitle">Have your symptoms been present for at least 3 months?</p>
+            <div class="radio-group duration-group">
+                <label class="radio-pill wide"><input type="radio" name="duration_4_weeks" value="yes"><span>Yes, more
+                        than 3 months</span></label>
+                <label class="radio-pill wide"><input type="radio" name="duration_4_weeks" value="no"><span>No, less
+                        than 3 months</span></label>
+            </div>
+        </div>
+
+        <div class="btns">
             <button class="btn btn-outline" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Previous</button>
             <button class="btn btn-primary" onclick="nextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
     <!-- ================= Step 4: Secondary Symptoms ================= -->
-    <div class="card hidden" id="step4">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-plus-circle"></i>
-                <h3>Secondary Symptom Screening</h3>
-            </div>
-        </div>
-        <p class="text-muted"><b>Instruction:</b> Select all symptoms that apply to you.</p>
+    <div class="screening-card hidden" id="step4">
+        <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
+        <h3>Secondary Symptom Screening</h3>
+        <p class="card-subtitle">Select all symptoms that apply to you.</p>
+        <p class="sec-counter">Selected: <strong id="secCount">0</strong> / 10</p>
 
-        <div class="question-list" style="margin-top: 1.5rem;">
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_headache" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you frequently experience headaches or migraines?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_paresthesia" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience tingling or numbness sensations (paresthesia)?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_allodynia" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience pain from normally non-painful stimuli
-                    (allodynia)?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_ibs" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience digestive issues such as IBS?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_depression" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you often experience feelings of depression or low mood?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_sweating" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience excessive or abnormal sweating?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_sensitivity" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Are you sensitive to light, sound, or noise?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_menstrual" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience significant menstrual pain? (Females)</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_stiffness" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience morning stiffness?</span>
-            </label>
-            <label class="checkbox-row"
-                style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer;">
-                <input type="checkbox" name="secondary_jaw" style="width: 18px; height: 18px;">
-                <span style="margin-left: 10px;">Do you experience jaw pain or TMJ discomfort?</span>
-            </label>
+        <div class="secondary-grid">
+            <label class="symptom-card"><input type="checkbox" name="secondary_headache"><i
+                    class="fas fa-head-side-virus"></i><span>Headaches / Migraines</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_paresthesia"><i
+                    class="fas fa-hand-sparkles"></i><span>Tingling / Numbness</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_allodynia"><i
+                    class="fas fa-hand-holding-medical"></i><span>Pain from Light Touch</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_ibs"><i
+                    class="fas fa-stomach"></i><span>Digestive Issues (IBS)</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_depression"><i
+                    class="fas fa-cloud-rain"></i><span>Depression / Low Mood</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_sweating"><i
+                    class="fas fa-droplet"></i><span>Excessive Sweating</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_sensitivity"><i
+                    class="fas fa-volume-high"></i><span>Light / Sound Sensitivity</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_menstrual"><i
+                    class="fas fa-venus"></i><span>Menstrual Pain</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_stiffness"><i
+                    class="fas fa-person-walking"></i><span>Morning Stiffness</span></label>
+            <label class="symptom-card"><input type="checkbox" name="secondary_jaw"><i
+                    class="fas fa-teeth"></i><span>Jaw Pain / TMJ</span></label>
         </div>
 
-        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+        <div class="btns">
             <button class="btn btn-outline" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Previous</button>
             <button class="btn btn-primary" onclick="nextStep(4)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
     <!-- ================= Step 5: Risk Factors ================= -->
-    <div class="card hidden" id="step5">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Risk Factor Assessment</h3>
+    <div class="screening-card hidden" id="step5">
+        <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3>Risk Factor Assessment</h3>
+        <p class="card-subtitle">These questions help assess known fibromyalgia risk factors.</p>
+
+        <div class="question-list">
+            <div class="question-card">
+                <span class="q-num">1</span>
+                <span class="q-text">Do you have a family history of chronic pain or fibromyalgia?</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="r1"
+                            value="yes"><span>Yes</span></label><label class="radio-pill"><input type="radio" name="r1"
+                            value="no"><span>No</span></label></div>
+            </div>
+            <div class="question-card">
+                <span class="q-num">2</span>
+                <span class="q-text">Do you have any coexisting medical conditions?</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="r2"
+                            value="yes"><span>Yes</span></label><label class="radio-pill"><input type="radio" name="r2"
+                            value="no"><span>No</span></label></div>
+            </div>
+            <div class="question-card">
+                <span class="q-num">3</span>
+                <span class="q-text">Have you experienced emotional or physical trauma in the past?</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="r3"
+                            value="yes"><span>Yes</span></label><label class="radio-pill"><input type="radio" name="r3"
+                            value="no"><span>No</span></label></div>
+            </div>
+            <div class="question-card">
+                <span class="q-num">4</span>
+                <span class="q-text">Have you been diagnosed with PTSD?</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="r4"
+                            value="yes"><span>Yes</span></label><label class="radio-pill"><input type="radio" name="r4"
+                            value="no"><span>No</span></label></div>
+            </div>
+            <div class="question-card">
+                <span class="q-num">5</span>
+                <span class="q-text">Do you experience anxiety or depression?</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="r5"
+                            value="yes"><span>Yes</span></label><label class="radio-pill"><input type="radio" name="r5"
+                            value="no"><span>No</span></label></div>
+            </div>
+            <div class="question-card">
+                <span class="q-num">6</span>
+                <span class="q-text">Would you describe your lifestyle as physically inactive?</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="r6"
+                            value="yes"><span>Yes</span></label><label class="radio-pill"><input type="radio" name="r6"
+                            value="no"><span>No</span></label></div>
+            </div>
+            <div class="question-card">
+                <span class="q-num"><i class="fas fa-venus-mars"></i></span>
+                <span class="q-text">Sex:</span>
+                <div class="radio-group"><label class="radio-pill"><input type="radio" name="sex"
+                            value="Male"><span>Male</span></label><label class="radio-pill"><input type="radio"
+                            name="sex" value="Female"><span>Female</span></label></div>
             </div>
         </div>
-        <p class="text-muted"><b>Instruction:</b> These questions help assess known FM risk factors.</p>
 
-        <div class="question-list" style="margin-top: 1.5rem;">
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Do you have a family history of chronic pain or
-                    fibromyalgia?</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r1" value="yes">
-                        Yes</label><label><input type="radio" name="r1" value="no"> No</label></div>
-            </div>
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Do you have any coexisting medical conditions?</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r2" value="yes">
-                        Yes</label><label><input type="radio" name="r2" value="no"> No</label></div>
-            </div>
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Have you experienced emotional or physical trauma in the
-                    past?</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r3" value="yes">
-                        Yes</label><label><input type="radio" name="r3" value="no"> No</label></div>
-            </div>
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Have you been diagnosed with PTSD?</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r4" value="yes">
-                        Yes</label><label><input type="radio" name="r4" value="no"> No</label></div>
-            </div>
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Do you experience anxiety or depression?</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r5" value="yes">
-                        Yes</label><label><input type="radio" name="r5" value="no"> No</label></div>
-            </div>
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Would you describe your lifestyle as physically
-                    inactive?</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="r6" value="yes">
-                        Yes</label><label><input type="radio" name="r6" value="no"> No</label></div>
-            </div>
-            <div class="question-row"
-                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span style="flex: 1; padding-right: 15px;">Sex:</span>
-                <div style="display: flex; gap: 15px;"><label><input type="radio" name="sex" value="Male">
-                        Male</label><label><input type="radio" name="sex" value="Female"> Female</label></div>
-            </div>
-        </div>
-
-        <div class="btns" style="display: flex; justify-content: space-between; margin-top: 2rem;">
+        <div class="btns">
             <button class="btn btn-outline" onclick="prevStep(5)"><i class="fas fa-arrow-left"></i> Previous</button>
-            <button class="btn btn-success" onclick="completeScreening()"><i class="fas fa-check"></i> Complete
+            <button class="btn btn-success btn-lg" onclick="completeScreening()"><i class="fas fa-check"></i> Complete
                 Screening</button>
         </div>
     </div>
 
-
-    <!-- ================= RESULT ================= -->
-    <div class="card hidden" id="step5">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-chart-pie"></i>
-                <h3>Screening Result</h3>
-            </div>
+    <!-- ================= RESULT (step6 — no more duplicate ID!) ================= -->
+    <div class="screening-card hidden" id="step6">
+        <div id="loadingBox" class="loading-state">
+            <div class="pulse-ring"></div>
+            <h4>Analyzing Your Responses...</h4>
+            <p class="card-subtitle">Our AI model is evaluating your risk profile.</p>
         </div>
 
-        <div class="result-box" id="loadingBox" style="text-align: center; padding: 40px;">
-            <div class="spinner-border text-primary" role="status"
-                style="width: 3rem; height: 3rem; margin-bottom: 1rem;">
-                <span class="sr-only">Processing...</span>
-            </div>
-            <h4>Calculating Results...</h4>
-            <p class="text-muted">Please wait while we process your answers.</p>
-        </div>
-
-        <div id="resultContent" class="hidden" style="text-align: center; padding: 20px;">
+        <div id="resultContent" class="hidden result-display">
             <div id="eligibleIcon" class="hidden">
-                <i class="fas fa-check-circle text-success" style="font-size: 4rem; margin-bottom: 1rem;"></i>
-                <h3 class="text-success">You are Eligible for the Study</h3>
+                <div class="result-icon eligible"><i class="fas fa-check-circle"></i></div>
+                <h3>You are Eligible for the Study</h3>
                 <p>Your symptoms meet the criteria for participation.</p>
             </div>
             <div id="notEligibleIcon" class="hidden">
-                <i class="fas fa-times-circle text-secondary" style="font-size: 4rem; margin-bottom: 1rem;"></i>
-                <h3 class="text-secondary">Screening Completed</h3>
+                <div class="result-icon not-eligible"><i class="fas fa-shield-alt"></i></div>
+                <h3>Screening Completed</h3>
                 <p>Based on your responses, you do not meet the primary eligibility criteria at this time.</p>
             </div>
 
-            <div
-                style="margin-top: 2rem; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left; display: inline-block;">
-                <p><strong>Risk Level:</strong> <span id="resRisk"></span></p>
-                <p><strong>WPI Score:</strong> <span id="resWPI"></span></p>
-                <p><strong>SSS Score:</strong> <span id="resSSS"></span></p>
+            <div class="result-scores">
+                <div class="score-card">
+                    <span class="score-label">Risk Level</span>
+                    <span class="score-value" id="resRisk">—</span>
+                </div>
+                <div class="score-card">
+                    <span class="score-label">WPI Score</span>
+                    <span class="score-value" id="resWPI">—</span>
+                </div>
+                <div class="score-card">
+                    <span class="score-label">SSS Score</span>
+                    <span class="score-value" id="resSSS">—</span>
+                </div>
             </div>
 
-            <div style="margin-top: 2rem;">
-                <a href="/profile-page" class="btn btn-primary btn-lg">Continue to Profile</a>
-            </div>
+            <a href="/profile-page" class="btn btn-primary btn-lg" style="margin-top:2rem;">Continue to Profile</a>
         </div>
-
     </div>
 
 </div>
@@ -536,65 +427,88 @@
 
 {% block scripts %}
 <script>
-    /* ---------- INITIAL STATE ---------- */
+    const TOTAL_STEPS = 6; // 0-5 input steps, 6 = results
+    let currentStep = 0;
+
     document.addEventListener("DOMContentLoaded", function () {
-        // Show ONLY consent page on load
         hideAllSteps();
         document.getElementById("step0").classList.remove("hidden");
-
-        // Disable start button initially
         document.getElementById("startBtn").disabled = true;
+        updateProgress(0);
+
+        // WPI counter
+        document.querySelectorAll('#step2 input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', () => {
+                document.getElementById('wpiCount').textContent =
+                    document.querySelectorAll('#step2 input[type="checkbox"]:checked').length;
+            });
+        });
+        // Secondary counter
+        document.querySelectorAll('#step4 input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', () => {
+                document.getElementById('secCount').textContent =
+                    document.querySelectorAll('#step4 input[type="checkbox"]:checked').length;
+            });
+        });
     });
 
-    /* ---------- CONSENT CHECK ---------- */
+    /* ---------- CONSENT ---------- */
     document.getElementById("consentCheck").addEventListener("change", function () {
         document.getElementById("startBtn").disabled = !this.checked;
     });
 
-    /* ---------- START SCREENING ---------- */
+    /* ---------- PROGRESS ---------- */
+    function updateProgress(step) {
+        const pct = (step / TOTAL_STEPS) * 100;
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.querySelectorAll('.progress-step').forEach(el => {
+            const s = parseInt(el.dataset.step);
+            el.classList.toggle('active', s <= step);
+            el.classList.toggle('done', s < step);
+        });
+    }
+
+    /* ---------- START ---------- */
     function startScreening() {
-        hideAllSteps();
-        document.getElementById("step1").classList.remove("hidden"); // FiRST tool
+        goToStep(1);
     }
 
-    /* ---------- STEP NAVIGATION ---------- */
-    function nextStep(n) {
-        hideAllSteps();
-        document.getElementById("step" + (n + 1)).classList.remove("hidden");
-        window.scrollTo(0, 0);
-    }
+    /* ---------- NAVIGATION ---------- */
+    function nextStep(n) { goToStep(n + 1); }
+    function prevStep(n) { goToStep(n - 1); }
 
-    function prevStep(n) {
+    function goToStep(n) {
         hideAllSteps();
-        document.getElementById("step" + (n - 1)).classList.remove("hidden");
-        window.scrollTo(0, 0);
+        const el = document.getElementById("step" + n);
+        if (el) {
+            el.classList.remove("hidden");
+            el.style.animation = 'fadeSlideIn 0.4s ease-out';
+        }
+        currentStep = n;
+        updateProgress(Math.min(n, TOTAL_STEPS));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     /* ---------- COMPLETE ---------- */
     function completeScreening() {
-        // Show loading state
-        hideAllSteps();
-        const step5 = document.getElementById("step5");
-        step5.classList.remove("hidden");
+        goToStep(6);
         document.getElementById("loadingBox").classList.remove("hidden");
         document.getElementById("resultContent").classList.add("hidden");
+        document.getElementById("progressBar").style.display = "none";
 
-        // 1. Collect FiRST data
+        // 1. FiRST
         const first = {};
         for (let i = 1; i <= 6; i++) {
-            const radios = document.getElementsByName('f' + i);
             let val = false;
-            // Loop through radios to find checked one
-            for (let r of radios) {
+            for (let r of document.getElementsByName('f' + i)) {
                 if (r.checked && r.value === 'yes') val = true;
             }
             first['f' + i] = val;
         }
 
         // 2. WPI
-        const wpiCheckboxes = document.querySelectorAll('#step2 input[type="checkbox"]');
         const wpiRegions = [];
-        wpiCheckboxes.forEach(cb => {
+        document.querySelectorAll('#step2 input[type="checkbox"]').forEach(cb => {
             if (cb.checked && cb.value) wpiRegions.push(cb.value);
         });
 
@@ -612,37 +526,28 @@
             depression: document.querySelector('input[name="depression"]:checked')?.value || 0
         };
 
-        // 5. Secondary Symptoms
-        const secCheckboxes = document.querySelectorAll('#step3 input[type="checkbox"]');
+        // 5. Secondary Symptoms (FIXED: was #step3, now #step4)
         const secondary_symptoms = [];
-        secCheckboxes.forEach(cb => {
+        document.querySelectorAll('#step4 input[type="checkbox"]').forEach(cb => {
             if (cb.checked) secondary_symptoms.push(cb.name);
         });
 
-        // 6. Risk Factors (Step 4)
+        // 6. Risk Factors
         const risk_factors = {};
         for (let i = 1; i <= 6; i++) {
-            const radios = document.getElementsByName('r' + i);
             let val = false;
-            // Iterate radios to check if 'yes' is selected
-            for (let r of radios) {
+            for (let r of document.getElementsByName('r' + i)) {
                 if (r.checked && r.value === 'yes') val = true;
             }
             risk_factors['r' + i] = val;
         }
-
-        // Capture Sex if needed for risk factor (though primarily profile)
         const sexRadio = document.querySelector('input[name="sex"]:checked');
-        if (sexRadio && sexRadio.value === 'Female') {
-            // We can optionally pass this if backend needs it from form
-            risk_factors['sex_female'] = true;
-        }
+        if (sexRadio && sexRadio.value === 'Female') risk_factors['sex_female'] = true;
 
-        // 7. Duration (New)
+        // 7. Duration
         const durationRadio = document.querySelector('input[name="duration_4_weeks"]:checked');
         const duration_4_weeks = durationRadio ? (durationRadio.value === 'yes') : false;
 
-        // Construct Payload
         const payload = {
             first_answers: first,
             wpi_regions: wpiRegions,
@@ -653,7 +558,6 @@
             duration_4_weeks: duration_4_weeks
         };
 
-        // Send to API
         fetch('/api/screening', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -662,12 +566,14 @@
             .then(res => res.json())
             .then(data => {
                 if (data.result) {
-                    // Update UI
                     document.getElementById("loadingBox").classList.add("hidden");
                     const resContent = document.getElementById("resultContent");
                     resContent.classList.remove("hidden");
 
-                    document.getElementById("resRisk").innerText = data.result.risk_level;
+                    const riskEl = document.getElementById("resRisk");
+                    riskEl.innerText = data.result.risk_level;
+                    riskEl.className = 'score-value risk-' + data.result.risk_level.toLowerCase();
+
                     document.getElementById("resWPI").innerText = data.result.wpi_score;
                     document.getElementById("resSSS").innerText = data.result.sss_score;
 
@@ -676,35 +582,613 @@
                     } else {
                         document.getElementById("notEligibleIcon").classList.remove("hidden");
                     }
-
                     showToast("Screening result saved", "success");
                 } else {
-                    showToast("Error saving result: " + (data.error || 'Unknown error'), "error");
-                    prevStep(5);
+                    showToast("Error: " + (data.error || 'Unknown'), "error");
+                    goToStep(5);
                 }
             })
             .catch(err => {
                 console.error(err);
                 showToast("Network error occurred.", "error");
-                prevStep(5);
+                goToStep(5);
             });
     }
 
     /* ---------- HELPER ---------- */
     function hideAllSteps() {
-        for (let i = 0; i <= 5; i++) {
+        for (let i = 0; i <= 6; i++) {
             const step = document.getElementById("step" + i);
             if (step) step.classList.add("hidden");
         }
     }
 </script>
+
 <style>
+    /* ========== SCREENING CONTAINER ========== */
+    .screening-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* ========== PROGRESS BAR ========== */
+    .screening-progress {
+        margin-bottom: 2rem;
+    }
+
+    .progress-track {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--primary-color), #6366f1);
+        border-radius: 99px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .progress-step span {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: #e9ecef;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .progress-step small {
+        font-size: 0.65rem;
+        color: #adb5bd;
+    }
+
+    .progress-step.active span {
+        background: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    .progress-step.done span {
+        background: #22c55e;
+        color: #fff;
+        border-color: #22c55e;
+    }
+
+    .progress-step.active small,
+    .progress-step.done small {
+        color: #495057;
+    }
+
+    /* ========== CARDS ========== */
+    .screening-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .screening-card h3 {
+        margin: 0 0 0.5rem;
+        color: var(--primary-color);
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-color), #6366f1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-subtitle {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* ========== CONSENT ========== */
+    .consent-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        max-height: 220px;
+        overflow-y: auto;
+        font-size: 0.93rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .consent-box ul {
+        padding-left: 1.2rem;
+        margin: 0;
+    }
+
+    .consent-box li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+
+    .consent-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .consent-label input[type="checkbox"] {
+        display: none;
+    }
+
+    .custom-check {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #dee2e6;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .consent-label input:checked~.custom-check {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+    }
+
+    /* ========== QUESTION CARDS (FiRST & Risk) ========== */
+    .question-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        background: #f8f9fa;
+        border: 1px solid #eee;
+        transition: all 0.2s ease;
+    }
+
+    .question-card:hover {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+    }
+
+    .q-num {
+        min-width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .q-text {
+        flex: 1;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    /* ========== RADIO PILLS ========== */
+    .radio-group {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .radio-pill {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .radio-pill input {
+        display: none;
+    }
+
+    .radio-pill span {
+        display: inline-block;
+        padding: 6px 18px;
+        border-radius: 99px;
+        border: 2px solid #dee2e6;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #495057;
+        transition: all 0.2s ease;
+        background: #fff;
+    }
+
+    .radio-pill input:checked+span {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+    }
+
+    .radio-pill.wide span {
+        padding: 10px 24px;
+    }
+
+    .duration-group {
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    /* ========== WPI GRID ========== */
+    .wpi-counter,
+    .sec-counter {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+        background: #f0f4ff;
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 99px;
+    }
+
+    .wpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-bottom: 1rem;
+    }
+
+    .region-card {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+    }
+
+    .region-card.accent {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+    }
+
+    .region-card h5 {
+        margin: 0 0 12px;
+        color: #495057;
+        font-size: 0.95rem;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .region-card.accent h5 {
+        border-color: #a5b4fc;
+    }
+
+    /* ========== CHECK ITEMS ========== */
+    .check-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 6px 0;
+        transition: color 0.2s;
+    }
+
+    .check-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+        cursor: pointer;
+    }
+
+    .check-item:hover {
+        color: var(--primary-color);
+    }
+
+    /* ========== SEVERITY GRID ========== */
+    .sub-section {
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .sub-section h4 {
+        color: var(--primary-color);
+        margin: 0 0 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        background: var(--primary-color);
+        color: #fff;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-weight: 600;
+    }
+
+    .severity-grid {
+        margin-top: 1rem;
+    }
+
+    .severity-row {
+        display: grid;
+        grid-template-columns: 1fr repeat(4, 70px);
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .severity-row.narrow {
+        grid-template-columns: 1fr repeat(2, 90px);
+    }
+
+    .severity-row.header {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.85rem;
+        background: #f8f9fa;
+        padding: 10px 8px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        border: none;
+    }
+
+    .sev-label {
+        font-size: 0.93rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 8px;
+    }
+
+    .sev-opt {
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .sev-opt input {
+        display: none;
+    }
+
+    .sev-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #dee2e6;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        transition: all 0.2s;
+        background: #fff;
+    }
+
+    .sev-opt input:checked+.sev-circle {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        transform: scale(1.1);
+    }
+
+    /* ========== SECONDARY GRID ========== */
+    .secondary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .symptom-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 20px 12px;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        background: #f8f9fa;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.25s ease;
+        font-size: 0.88rem;
+    }
+
+    .symptom-card input {
+        display: none;
+    }
+
+    .symptom-card i {
+        font-size: 1.4rem;
+        color: #adb5bd;
+        transition: all 0.25s;
+    }
+
+    .symptom-card:hover {
+        border-color: #c7d2fe;
+        background: #eef2ff;
+    }
+
+    .symptom-card:has(input:checked) {
+        border-color: var(--primary-color);
+        background: #eef2ff;
+        box-shadow: 0 2px 12px rgba(99, 102, 241, 0.15);
+    }
+
+    .symptom-card:has(input:checked) i {
+        color: var(--primary-color);
+    }
+
+    /* ========== BUTTONS ========== */
+    .btns {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .btns:has(.btn-outline) {
+        justify-content: space-between;
+    }
+
+    /* ========== RESULT ========== */
+    .loading-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .pulse-ring {
+        width: 60px;
+        height: 60px;
+        border: 4px solid var(--primary-color);
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.9);
+            opacity: 0.6;
+        }
+
+        50% {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(0.9);
+            opacity: 0.6;
+        }
+    }
+
+    .result-display {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .result-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .result-icon.eligible {
+        color: #22c55e;
+    }
+
+    .result-icon.not-eligible {
+        color: #6c757d;
+    }
+
+    .result-scores {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .score-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px 28px;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        min-width: 140px;
+    }
+
+    .score-label {
+        display: block;
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .score-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .risk-high {
+        color: #ef4444 !important;
+    }
+
+    .risk-moderate {
+        color: #f59e0b !important;
+    }
+
+    .risk-low {
+        color: #22c55e !important;
+    }
+
+    /* ========== ANIMATION ========== */
+    @keyframes fadeSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .hidden {
         display: none !important;
     }
 
-    .question-row:hover {
-        background-color: #fafafa;
+    .question-card:hover .q-num {
+        transform: scale(1.1);
     }
 </style>
 {% endblock %}
