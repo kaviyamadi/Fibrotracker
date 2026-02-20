@@ -39,8 +39,8 @@ except Exception as e:
 GAD_MODEL = None
 PHQ_MODEL = None
 try:
-    GAD_MODEL = joblib.load("dataset/models/gad/gad7_severity_model.pkl")
-    PHQ_MODEL = joblib.load("dataset/models/phq/phq_severity_model.pkl")
+    GAD_MODEL = joblib.load("dataset/model/models/gad/gad7_severity_model.pkl")
+    PHQ_MODEL = joblib.load("dataset/model/models/phq/phq_severity_model.pkl")
     print("✅ GAD/PHQ models loaded successfully.")
 except Exception as e:
     print(f"⚠️ Could not load GAD/PHQ models: {e}")
@@ -2076,17 +2076,17 @@ def api_save_screening():
     # ---------------------------------------------------------
     # --- Calculate Modular Total Score ---
     modular_total_score = (
-        (primary_scaled * 0.4) + 
+        (primary_scaled * 0.6) + 
         (secondary_score_norm * 0.3) + 
-        (risk_factor_fraction * 0.3)
+        (risk_factor_fraction * 0.1)
     )
 
     # --- ML Model Prediction ---
     # Default to rule-based manual calculation first
     risk_category = "Low"
-    if modular_total_score >= 0.7:
+    if modular_total_score >= 0.61:
         risk_category = "High"
-    elif modular_total_score >= 0.4:
+    elif modular_total_score >= 0.31:
         risk_category = "Moderate"
     
     total_risk_score = float(modular_total_score) # legacy assignment
@@ -2126,7 +2126,8 @@ def api_save_screening():
                 "symptom_persistence": persistence_val,
                 "secondary_score_norm": secondary_score_norm,
                 "risk_factor_fraction": risk_factor_fraction,
-                "rf_total": risk_sum
+                "rf_total": risk_sum,
+                "modular_total_score": modular_total_score
             }])
             
             # Predict
@@ -2148,6 +2149,11 @@ def api_save_screening():
                 
             print(f"🤖 ML Prediction: Category={risk_category}, Prob={total_risk_score:.2f}")
             
+            # Rule override safety net: rules cannot be violated by ML
+            if modular_total_score >= 0.7:
+                risk_category = "High"
+                print(f"⚠️ Rule override: modular_total_score={modular_total_score:.2f} >= 0.7, forcing High")
+
         except Exception as e:
             print(f"⚠️ ML Prediction failed, using manual calculation: {e}")
 
