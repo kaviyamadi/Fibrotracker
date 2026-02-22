@@ -482,7 +482,7 @@
         const el = document.getElementById("step" + n);
         if (el) {
             el.classList.remove("hidden");
-            el.style.animation = 'fadeSlideIn 0.4s ease-out';
+            el.style.animation = 'fadeSlideIn 0.4s ease-out forwards';
         }
         currentStep = n;
         updateProgress(Math.min(n, TOTAL_STEPS));
@@ -742,10 +742,16 @@
     .consent-label {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         cursor: pointer;
         font-weight: 500;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        transition: all 0.2s ease;
+    }
+
+    .consent-label:hover {
+        color: var(--primary-color);
     }
 
     .consent-label input[type="checkbox"] {
@@ -753,16 +759,28 @@
     }
 
     .custom-check {
-        width: 24px;
-        height: 24px;
-        border: 2px solid #dee2e6;
+        width: 26px;
+        height: 26px;
+        border: 2.5px solid #0f172a;
+        /* Darkest slate for high contrast */
         border-radius: 6px;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         color: transparent;
-        transition: all 0.2s;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         flex-shrink: 0;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        min-width: 26px;
+        min-height: 26px;
+    }
+
+    .consent-label:hover .custom-check {
+        border-color: var(--primary-color);
+        background: #f1f5f9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .consent-label input:checked~.custom-check {
