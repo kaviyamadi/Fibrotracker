@@ -286,6 +286,7 @@ def init_db():
                 sss_score INTEGER,
                 meets_criteria BOOLEAN,
                 risk_level TEXT,
+                risk_probability REAL,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )
         ''')
@@ -322,6 +323,15 @@ def check_and_migrate_db():
             conn.execute('ALTER TABLE daily_entries ADD COLUMN menstrual_phase TEXT')
         if 'pain_area_count' not in columns:
             conn.execute('ALTER TABLE daily_entries ADD COLUMN pain_area_count INTEGER')
+
+        # -------------------------------------------------
+        # Add risk_probability column to screenings if missing
+        # -------------------------------------------------
+        cursor = conn.execute('PRAGMA table_info(screenings)')
+        screening_cols = [row['name'] for row in cursor.fetchall()]
+        if 'risk_probability' not in screening_cols:
+            conn.execute('ALTER TABLE screenings ADD COLUMN risk_probability REAL')
+            print("Added risk_probability column to screenings table.")
 
         # -------------------------------------------------
         # FIX: primary_symptoms pain_score constraint (0-10 -> 0-19)
@@ -2228,8 +2238,8 @@ def api_save_screening():
             INSERT INTO screenings (
                 user_id, pain_regions, secondary_symptoms, primary_symptoms, 
                 duration, bmi, first_score, wpi_score, sss_score, 
-                meets_criteria, risk_level
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                meets_criteria, risk_level, risk_probability
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             user_id, 
             json.dumps(wpi_regions), 
@@ -2239,7 +2249,8 @@ def api_save_screening():
             None, 
             first_score, # Calculated score
             wpi_score, sss_score, 
-            is_eligible, risk_category
+            is_eligible, risk_category,
+            round(total_risk_score, 4)  # Store probability
         ))
 
         conn.commit()

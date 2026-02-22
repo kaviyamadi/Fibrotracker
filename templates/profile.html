@@ -478,8 +478,8 @@
                     <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div>
-                                <small style="display:block; color:var(--gray-500);">FiRST Score</small>
-                                <strong style="font-size:1.1rem;">${data.first_score || 0}/6</strong>
+                                <small style="display:block; color:var(--gray-500);">Probability Score</small>
+                                <strong style="font-size:1.1rem;">${data.risk_probability != null ? (data.risk_probability * 100).toFixed(1) + '%' : 'N/A'}</strong>
                             </div>
                             <div>
                                 <small style="display:block; color:var(--gray-500);">Criteria Status</small>
