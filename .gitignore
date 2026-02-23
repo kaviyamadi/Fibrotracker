@@ -1,3 +1,4 @@
 .env
 .venv
+fibro_risk_model.pkl
 dataset
