@@ -446,7 +446,7 @@ def validate_profile_payload(data):
 
     if sex and sex not in VALID_SEX:
         return False, f"Invalid sex value. Allowed: {', '.join(VALID_SEX)}"
-    if age_group and age_group not in VALID_AGE_GROPS:
+    if age_group and age_group not in VALID_AGE_GROUPS:
         return False, f"Invalid age_group. Allowed: {', '.join(VALID_AGE_GROUPS)}"
     if workload and workload not in VALID_WORKLOAD:
         return False, f"Invalid workload. Allowed: {', '.join(VALID_WORKLOAD)}"
@@ -1191,7 +1191,7 @@ def api_ai_suggestions():
         return jsonify({'error': 'Summary data required'}), 400
 
     try:
-        model_gemini = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""
         You are a medical assistant for Fibromyalgia patients.
         Here is the patient's summary data:
@@ -1247,7 +1247,7 @@ def api_dashboard_ai_suggestions():
 
     # Generate AI suggestions
     try:
-        model_gemini = genai.GenerativeModel('gemini-2.0-flash')
+        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""
         You are a medical assistant for Fibromyalgia patients.
         Here is the patient's recent 7-day summary:
@@ -1383,7 +1383,7 @@ def api_report_weekly():
     """
 
     try:
-        model_gemini = genai.GenerativeModel("gemini-2.0-flash")
+        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
         response = model_gemini.generate_content(ai_prompt)
         ai_advice = response.text
     except Exception as e:
@@ -1436,7 +1436,7 @@ def api_report_final():
     """
 
     try:
-        model_gemini = genai.GenerativeModel("gemini-2.0-flash")
+        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
         response = model_gemini.generate_content(ai_prompt)
         ai_advice = response.text
     except Exception as e:
@@ -1653,7 +1653,7 @@ def api_chat():
         return jsonify({'error': 'Message required'}), 400
 
     try:
-        model_gemini = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
         response = model_gemini.generate_content(message)
         chat_reply = response.text
     except Exception as e:
@@ -2167,6 +2167,11 @@ def api_save_screening():
         except Exception as e:
             print(f"⚠️ ML Prediction failed, using manual calculation: {e}")
 
+    # FiRST score consistency floor: score >= 5 cannot produce "Low" risk
+    if first_score >= 5 and risk_category == "Low":
+        risk_category = "Moderate"
+        print(f"⚠️ FiRST floor override: first_score={first_score} >= 5, bumping Low → Moderate")
+
     # Determine Eligibility (Rule-based safety net + risk)
     # User is eligible if High/Moderate risk AND meets ACR criteria (roughly)
     # ACR 2016: WPI >= 7 & SSS >= 5 OR WPI 3-6 & SSS >= 9
@@ -2259,6 +2264,9 @@ def api_save_screening():
         return jsonify({'error': str(e)}), 500
     conn.close()
 
+    # Secondary evaluation score as percentage (0-100)
+    secondary_eval_score = round(modular_total_score * 100, 1)
+
     return jsonify({
         'message': 'Screening saved successfully',
         'result': {
@@ -2266,9 +2274,43 @@ def api_save_screening():
             'risk_probability': total_risk_score,
             'is_eligible': is_eligible,
             'wpi_score': wpi_score,
-            'sss_score': sss_score
+            'sss_score': sss_score,
+            'first_score': first_score,
+            'secondary_eval_score': secondary_eval_score
         }
     })
+
+@app.route('/api/screening/early-exit', methods=['POST'])
+@login_required
+def api_screening_early_exit():
+    """Save a partial screening record when FiRST score is below threshold."""
+    user_id = session['user_id']
+    data = request.json or {}
+    first_score = data.get('first_score', 0)
+
+    try:
+        conn = get_db_connection()
+        conn.execute('''
+            INSERT INTO screenings (
+                user_id, pain_regions, secondary_symptoms, primary_symptoms,
+                duration, bmi, first_score, wpi_score, sss_score,
+                meets_criteria, risk_level, risk_probability
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id,
+            json.dumps([]),  # no pain regions
+            json.dumps([]),  # no secondary symptoms
+            json.dumps({}),  # no primary symptoms
+            None, None,
+            first_score,
+            0, 0,  # wpi=0, sss=0
+            False, 'Low', 0.0
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Early exit screening saved'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/latest-screening', methods=['GET'])
 @login_required
