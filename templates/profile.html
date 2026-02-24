@@ -133,6 +133,33 @@
                         <option value="65+">65+ years</option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label for="education">
+                        <i class="fas fa-graduation-cap"></i> Education
+                        <span class="optional">(optional)</span>
+                    </label>
+                    <input type="text" id="education" name="education" class="form-control"
+                        placeholder="e.g., Bachelor's, Master's, High School">
+                </div>
+
+                <div class="form-group">
+                    <label for="occupation">
+                        <i class="fas fa-briefcase"></i> Occupation
+                        <span class="optional">(optional)</span>
+                    </label>
+                    <input type="text" id="occupation" name="occupation" class="form-control"
+                        placeholder="e.g., Teacher, Engineer, Homemaker">
+                </div>
+
+                <div class="form-group">
+                    <label for="residence">
+                        <i class="fas fa-map-marker-alt"></i> Residence
+                        <span class="optional">(optional)</span>
+                    </label>
+                    <input type="text" id="residence" name="residence" class="form-control"
+                        placeholder="e.g., City, State">
+                </div>
             </div>
         </div>
 
@@ -389,6 +416,16 @@
                 if (data.age_group) {
                     document.getElementById('age_group').value = data.age_group;
                 }
+                // New optional fields
+                if (data.education) {
+                    document.getElementById('education').value = data.education;
+                }
+                if (data.occupation) {
+                    document.getElementById('occupation').value = data.occupation;
+                }
+                if (data.residence) {
+                    document.getElementById('residence').value = data.residence;
+                }
 
                 // Medical history
                 if (data.comorbidities) {
@@ -478,8 +515,8 @@
                     <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div>
-                                <small style="display:block; color:var(--gray-500);">FiRST Score</small>
-                                <strong style="font-size:1.1rem;">${data.first_score || 0}/6</strong>
+                                <small style="display:block; color:var(--gray-500);">Probability Score</small>
+                                <strong style="font-size:1.1rem;">${data.risk_probability != null ? (data.risk_probability * 100).toFixed(1) + '%' : 'N/A'}</strong>
                             </div>
                             <div>
                                 <small style="display:block; color:var(--gray-500);">Criteria Status</small>
@@ -614,7 +651,10 @@
             comorbidities: comorbidities.join(', '),
             family_history: document.querySelector('input[name="family_history"]:checked')?.value || '',
             menstrual_cycle: document.querySelector('input[name="menstrual_cycle"]:checked')?.value || '',
-            weather_sensitivity: document.querySelector('input[name="weather_sensitivity"]:checked')?.value || ''
+            weather_sensitivity: document.querySelector('input[name="weather_sensitivity"]:checked')?.value || '',
+            education: document.getElementById('education').value,
+            occupation: document.getElementById('occupation').value,
+            residence: document.getElementById('residence').value
         };
 
         try {

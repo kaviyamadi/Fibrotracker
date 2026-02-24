@@ -13,10 +13,11 @@
         <div class="progress-steps">
             <div class="progress-step active" data-step="0"><span>1</span><small>Consent</small></div>
             <div class="progress-step" data-step="1"><span>2</span><small>FiRST</small></div>
-            <div class="progress-step" data-step="2"><span>3</span><small>Pain</small></div>
-            <div class="progress-step" data-step="3"><span>4</span><small>Severity</small></div>
-            <div class="progress-step" data-step="4"><span>5</span><small>Secondary</small></div>
-            <div class="progress-step" data-step="5"><span>6</span><small>Risk</small></div>
+            <div class="progress-step" data-step="2"><span>3</span><small>Result</small></div>
+            <div class="progress-step" data-step="3"><span>4</span><small>Pain</small></div>
+            <div class="progress-step" data-step="4"><span>5</span><small>Severity</small></div>
+            <div class="progress-step" data-step="5"><span>6</span><small>Secondary</small></div>
+            <div class="progress-step" data-step="6"><span>7</span><small>Risk</small></div>
         </div>
     </div>
 
@@ -112,12 +113,45 @@
             </div>
         </div>
 
-        <div class="btns"><button class="btn btn-primary" onclick="nextStep(1)">Next <i
+        <div class="btns"><button class="btn btn-primary" onclick="showFirstResult()">Next <i
                     class="fas fa-arrow-right"></i></button></div>
     </div>
 
-    <!-- ================= Step 2: WPI ================= -->
+    <!-- ================= FiRST RESULT (intermediate) ================= -->
     <div class="screening-card hidden" id="step2">
+        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>FiRST Score Result</h3>
+        <p class="card-subtitle">Your Fibromyalgia Rapid Screening Tool score based on your answers.</p>
+
+        <div class="first-result-display">
+            <div class="first-score-ring">
+                <span class="first-score-num" id="firstScoreDisplay">0</span>
+                <span class="first-score-denom">/ 6</span>
+            </div>
+            <div class="first-interpretation" id="firstInterpretation"></div>
+            <p class="first-note" id="firstNote">This is your initial screening indicator. Continue to the secondary
+                evaluation for a
+                more comprehensive assessment.</p>
+        </div>
+
+        <!-- Exit message for scores below threshold -->
+        <div id="firstExitMessage" class="hidden first-exit-box">
+            <div class="exit-icon"><i class="fas fa-shield-alt"></i></div>
+            <h4>Screening Complete</h4>
+            <p>Based on your FiRST score, your responses do not meet the threshold for further evaluation at this time.
+                If you believe you are experiencing symptoms, please consult a healthcare professional.</p>
+            <a href="/profile-page" class="btn btn-primary btn-lg" style="margin-top:1rem;">Return to Profile</a>
+        </div>
+
+        <div class="btns" id="firstBtns">
+            <button class="btn btn-outline" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" id="firstContinueBtn" onclick="nextStep(2)">Continue to Secondary Evaluation
+                <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= Step 3: WPI ================= -->
+    <div class="screening-card hidden" id="step3">
         <div class="card-icon"><i class="fas fa-procedures"></i></div>
         <h3>Primary Symptoms: Pain Locations</h3>
         <p class="card-subtitle">Check all areas where you have had pain in the last week.</p>
@@ -172,13 +206,13 @@
         </div>
 
         <div class="btns">
-            <button class="btn btn-outline" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Previous</button>
-            <button class="btn btn-primary" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+            <button class="btn btn-outline" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
-    <!-- ================= Step 3: SSS & Persistence ================= -->
-    <div class="screening-card hidden" id="step3">
+    <!-- ================= Step 4: SSS & Persistence ================= -->
+    <div class="screening-card hidden" id="step4">
         <div class="card-icon"><i class="fas fa-notes-medical"></i></div>
         <h3>Symptom Severity & Duration</h3>
 
@@ -277,13 +311,13 @@
         </div>
 
         <div class="btns">
-            <button class="btn btn-outline" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Previous</button>
-            <button class="btn btn-primary" onclick="nextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+            <button class="btn btn-outline" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" onclick="nextStep(4)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
-    <!-- ================= Step 4: Secondary Symptoms ================= -->
-    <div class="screening-card hidden" id="step4">
+    <!-- ================= Step 5: Secondary Symptoms ================= -->
+    <div class="screening-card hidden" id="step5">
         <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
         <h3>Secondary Symptom Screening</h3>
         <p class="card-subtitle">Select all symptoms that apply to you.</p>
@@ -313,13 +347,13 @@
         </div>
 
         <div class="btns">
-            <button class="btn btn-outline" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Previous</button>
-            <button class="btn btn-primary" onclick="nextStep(4)">Next <i class="fas fa-arrow-right"></i></button>
+            <button class="btn btn-outline" onclick="prevStep(5)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-primary" onclick="nextStep(5)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
-    <!-- ================= Step 5: Risk Factors ================= -->
-    <div class="screening-card hidden" id="step5">
+    <!-- ================= Step 6: Risk Factors ================= -->
+    <div class="screening-card hidden" id="step6">
         <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
         <h3>Risk Factor Assessment</h3>
         <p class="card-subtitle">These questions help assess known fibromyalgia risk factors.</p>
@@ -377,14 +411,14 @@
         </div>
 
         <div class="btns">
-            <button class="btn btn-outline" onclick="prevStep(5)"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button class="btn btn-outline" onclick="prevStep(6)"><i class="fas fa-arrow-left"></i> Previous</button>
             <button class="btn btn-success btn-lg" onclick="completeScreening()"><i class="fas fa-check"></i> Complete
                 Screening</button>
         </div>
     </div>
 
-    <!-- ================= RESULT (step6 — no more duplicate ID!) ================= -->
-    <div class="screening-card hidden" id="step6">
+    <!-- ================= RESULT (step7) ================= -->
+    <div class="screening-card hidden" id="step7">
         <div id="loadingBox" class="loading-state">
             <div class="pulse-ring"></div>
             <h4>Analyzing Your Responses...</h4>
@@ -404,6 +438,16 @@
             </div>
 
             <div class="result-scores">
+                <div class="score-card highlight-first">
+                    <span class="score-label">FiRST Score</span>
+                    <span class="score-value" id="resFiRST">—</span>
+                    <span class="score-sub">/ 6</span>
+                </div>
+                <div class="score-card highlight-secondary">
+                    <span class="score-label">Secondary Evaluation</span>
+                    <span class="score-value" id="resSecEval">—</span>
+                    <span class="score-sub">%</span>
+                </div>
                 <div class="score-card">
                     <span class="score-label">Risk Level</span>
                     <span class="score-value" id="resRisk">—</span>
@@ -427,7 +471,7 @@
 
 {% block scripts %}
 <script>
-    const TOTAL_STEPS = 6; // 0-5 input steps, 6 = results
+    const TOTAL_STEPS = 7; // 0-6 input steps, 7 = results
     let currentStep = 0;
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -437,17 +481,17 @@
         updateProgress(0);
 
         // WPI counter
-        document.querySelectorAll('#step2 input[type="checkbox"]').forEach(cb => {
+        document.querySelectorAll('#step3 input[type="checkbox"]').forEach(cb => {
             cb.addEventListener('change', () => {
                 document.getElementById('wpiCount').textContent =
-                    document.querySelectorAll('#step2 input[type="checkbox"]:checked').length;
+                    document.querySelectorAll('#step3 input[type="checkbox"]:checked').length;
             });
         });
         // Secondary counter
-        document.querySelectorAll('#step4 input[type="checkbox"]').forEach(cb => {
+        document.querySelectorAll('#step5 input[type="checkbox"]').forEach(cb => {
             cb.addEventListener('change', () => {
                 document.getElementById('secCount').textContent =
-                    document.querySelectorAll('#step4 input[type="checkbox"]:checked').length;
+                    document.querySelectorAll('#step5 input[type="checkbox"]:checked').length;
             });
         });
     });
@@ -473,6 +517,53 @@
         goToStep(1);
     }
 
+    /* ---------- FiRST RESULT ---------- */
+    function showFirstResult() {
+        // Calculate FiRST score from the 6 yes/no questions
+        let score = 0;
+        for (let i = 1; i <= 6; i++) {
+            const radios = document.getElementsByName('f' + i);
+            for (let r of radios) {
+                if (r.checked && r.value === 'yes') score++;
+            }
+        }
+        // Display score
+        document.getElementById('firstScoreDisplay').textContent = score;
+
+        // Interpretation + gating (threshold: score >= 5 to continue)
+        const interpEl = document.getElementById('firstInterpretation');
+        const continueBtn = document.getElementById('firstContinueBtn');
+        const exitMsg = document.getElementById('firstExitMessage');
+        const noteEl = document.getElementById('firstNote');
+
+        if (score >= 5) {
+            // PASS — allow continuation
+            interpEl.innerHTML = '<span class="interp-badge interp-high"><i class="fas fa-exclamation-circle"></i> High Likelihood</span><p>Your FiRST score suggests a high likelihood of fibromyalgia-related symptoms.</p>';
+            continueBtn.classList.remove('hidden');
+            exitMsg.classList.add('hidden');
+            noteEl.classList.remove('hidden');
+        } else {
+            // FAIL — exit screening
+            if (score >= 3) {
+                interpEl.innerHTML = '<span class="interp-badge interp-moderate"><i class="fas fa-info-circle"></i> Moderate Likelihood</span><p>Your score does not meet the threshold (5/6) required for further evaluation.</p>';
+            } else {
+                interpEl.innerHTML = '<span class="interp-badge interp-low"><i class="fas fa-check-circle"></i> Low Likelihood</span><p>Your score does not meet the threshold (5/6) required for further evaluation.</p>';
+            }
+            continueBtn.classList.add('hidden');
+            exitMsg.classList.remove('hidden');
+            noteEl.classList.add('hidden');
+            document.getElementById('progressBar').style.display = 'none';
+
+            // Save early-exit result to DB so profile page updates
+            fetch('/api/screening/early-exit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ first_score: score })
+            }).catch(err => console.error('Early exit save failed:', err));
+        }
+        goToStep(2);
+    }
+
     /* ---------- NAVIGATION ---------- */
     function nextStep(n) { goToStep(n + 1); }
     function prevStep(n) { goToStep(n - 1); }
@@ -482,7 +573,7 @@
         const el = document.getElementById("step" + n);
         if (el) {
             el.classList.remove("hidden");
-            el.style.animation = 'fadeSlideIn 0.4s ease-out';
+            el.style.animation = 'fadeSlideIn 0.4s ease-out forwards';
         }
         currentStep = n;
         updateProgress(Math.min(n, TOTAL_STEPS));
@@ -491,7 +582,7 @@
 
     /* ---------- COMPLETE ---------- */
     function completeScreening() {
-        goToStep(6);
+        goToStep(7);
         document.getElementById("loadingBox").classList.remove("hidden");
         document.getElementById("resultContent").classList.add("hidden");
         document.getElementById("progressBar").style.display = "none";
@@ -508,7 +599,7 @@
 
         // 2. WPI
         const wpiRegions = [];
-        document.querySelectorAll('#step2 input[type="checkbox"]').forEach(cb => {
+        document.querySelectorAll('#step3 input[type="checkbox"]').forEach(cb => {
             if (cb.checked && cb.value) wpiRegions.push(cb.value);
         });
 
@@ -526,9 +617,9 @@
             depression: document.querySelector('input[name="depression"]:checked')?.value || 0
         };
 
-        // 5. Secondary Symptoms (FIXED: was #step3, now #step4)
+        // 5. Secondary Symptoms
         const secondary_symptoms = [];
-        document.querySelectorAll('#step4 input[type="checkbox"]').forEach(cb => {
+        document.querySelectorAll('#step5 input[type="checkbox"]').forEach(cb => {
             if (cb.checked) secondary_symptoms.push(cb.name);
         });
 
@@ -576,6 +667,8 @@
 
                     document.getElementById("resWPI").innerText = data.result.wpi_score;
                     document.getElementById("resSSS").innerText = data.result.sss_score;
+                    document.getElementById("resFiRST").innerText = data.result.first_score;
+                    document.getElementById("resSecEval").innerText = data.result.secondary_eval_score;
 
                     if (data.result.is_eligible) {
                         document.getElementById("eligibleIcon").classList.remove("hidden");
@@ -585,19 +678,19 @@
                     showToast("Screening result saved", "success");
                 } else {
                     showToast("Error: " + (data.error || 'Unknown'), "error");
-                    goToStep(5);
+                    goToStep(6);
                 }
             })
             .catch(err => {
                 console.error(err);
                 showToast("Network error occurred.", "error");
-                goToStep(5);
+                goToStep(6);
             });
     }
 
     /* ---------- HELPER ---------- */
     function hideAllSteps() {
-        for (let i = 0; i <= 6; i++) {
+        for (let i = 0; i <= 7; i++) {
             const step = document.getElementById("step" + i);
             if (step) step.classList.add("hidden");
         }
@@ -742,10 +835,16 @@
     .consent-label {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         cursor: pointer;
         font-weight: 500;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        transition: all 0.2s ease;
+    }
+
+    .consent-label:hover {
+        color: var(--primary-color);
     }
 
     .consent-label input[type="checkbox"] {
@@ -753,16 +852,28 @@
     }
 
     .custom-check {
-        width: 24px;
-        height: 24px;
-        border: 2px solid #dee2e6;
+        width: 26px;
+        height: 26px;
+        border: 2.5px solid #0f172a;
+        /* Darkest slate for high contrast */
         border-radius: 6px;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         color: transparent;
-        transition: all 0.2s;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         flex-shrink: 0;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        min-width: 26px;
+        min-height: 26px;
+    }
+
+    .consent-label:hover .custom-check {
+        border-color: var(--primary-color);
+        background: #f1f5f9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .consent-label input:checked~.custom-check {
@@ -1189,6 +1300,137 @@
 
     .question-card:hover .q-num {
         transform: scale(1.1);
+    }
+
+    /* ========== FiRST RESULT INTERMEDIATE ========== */
+    .first-result-display {
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+
+    .first-score-ring {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 5px solid var(--primary-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02));
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+    }
+
+    .first-score-num {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        line-height: 1;
+    }
+
+    .first-score-denom {
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .first-interpretation {
+        margin-bottom: 1rem;
+    }
+
+    .interp-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .interp-high {
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+    }
+
+    .interp-moderate {
+        background: #fffbeb;
+        color: #f59e0b;
+        border: 1px solid #fde68a;
+    }
+
+    .interp-low {
+        background: #f0fdf4;
+        color: #22c55e;
+        border: 1px solid #bbf7d0;
+    }
+
+    .first-interpretation p {
+        color: #6c757d;
+        font-size: 0.93rem;
+        margin-top: 0.5rem;
+    }
+
+    .first-note {
+        color: #9ca3af;
+        font-size: 0.85rem;
+        font-style: italic;
+        margin-top: 1rem;
+    }
+
+    /* ========== HIGHLIGHTED SCORE CARDS ========== */
+    .score-card.highlight-first {
+        background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+        border-color: #a5b4fc;
+    }
+
+    .score-card.highlight-first .score-value {
+        color: var(--primary-color);
+    }
+
+    .score-card.highlight-secondary {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border-color: #86efac;
+    }
+
+    .score-card.highlight-secondary .score-value {
+        color: #16a34a;
+    }
+
+    .score-sub {
+        display: block;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+
+    /* ========== EXIT BOX (below threshold) ========== */
+    .first-exit-box {
+        text-align: center;
+        padding: 2rem;
+        margin-top: 1.5rem;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+    }
+
+    .first-exit-box h4 {
+        color: #dc2626;
+        margin: 0.5rem 0;
+    }
+
+    .first-exit-box p {
+        color: #6c757d;
+        font-size: 0.93rem;
+        line-height: 1.5;
+    }
+
+    .exit-icon {
+        font-size: 2.5rem;
+        color: #6c757d;
     }
 </style>
 {% endblock %}

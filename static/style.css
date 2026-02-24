@@ -6,6 +6,7 @@
 :root {
     /* Primary Colors - Professional Blues */
     --primary-blue: #2563eb;
+    --primary-color: #2563eb; /* Alias used by screening page */
     --primary-blue-dark: #1e40af;
     --primary-blue-light: #3b82f6;
     

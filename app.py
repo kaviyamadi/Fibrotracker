@@ -286,9 +286,73 @@ def init_db():
                 sss_score INTEGER,
                 meets_criteria BOOLEAN,
                 risk_level TEXT,
+                risk_probability REAL,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )
         ''')
+
+        # -------------------------------------------------
+        # Weekly Log (manual clinical scales: PSQI, PSS, FSS)
+        # -------------------------------------------------
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS weekly_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            week_start_date TEXT NOT NULL,
+            psqi_score REAL,
+            pss_score REAL,
+            fss_score REAL,
+            is_estimated INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+        ''')
+
+        # -------------------------------------------------
+        # Analysis Result
+        # -------------------------------------------------
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS analysis_result (
+            analysis_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_id INTEGER NOT NULL,
+            period_start TEXT,
+            period_end TEXT,
+            mean_pain REAL,
+            pain_variability REAL,
+            trend_slope REAL,
+            flare_count INTEGER DEFAULT 0,
+            weekly_risk_level TEXT CHECK(weekly_risk_level IN ('Low','Moderate','High','insufficient_data')),
+            consecutive_high_risk_weeks INTEGER DEFAULT 0,
+            persistent_risk_flag INTEGER DEFAULT 0,
+            cluster_label INTEGER,
+            dominant_trigger TEXT,
+            final_risk_level TEXT,
+            recommendation TEXT,
+            data_completeness_score REAL,
+            missing_days_count INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+        ''')
+
+        # -------------------------------------------------
+        # Tracking Status (Adaptive Monitoring)
+        # -------------------------------------------------
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS tracking_status (
+            status_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_id INTEGER NOT NULL UNIQUE,
+            tracking_active INTEGER DEFAULT 1,
+            monitoring_start_date TEXT,
+            monitoring_end_date TEXT,
+            weeks_observed INTEGER DEFAULT 0,
+            stable_low_weeks_count INTEGER DEFAULT 0,
+            tracking_stage TEXT DEFAULT 'monitoring' CHECK(tracking_stage IN ('monitoring','trigger_analysis','completed')),
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+        ''')
+
     conn.close()
 
 def check_and_migrate_db():
@@ -324,14 +388,32 @@ def check_and_migrate_db():
             conn.execute('ALTER TABLE daily_entries ADD COLUMN pain_area_count INTEGER')
 
         # -------------------------------------------------
+        # Add risk_probability column to screenings if missing
+        # -------------------------------------------------
+        cursor = conn.execute('PRAGMA table_info(screenings)')
+        screening_cols = [row['name'] for row in cursor.fetchall()]
+        if 'risk_probability' not in screening_cols:
+            conn.execute('ALTER TABLE screenings ADD COLUMN risk_probability REAL')
+            print("Added risk_probability column to screenings table.")
+
+        # -------------------------------------------------
+        # Add profile fields: education, occupation, residence
+        # -------------------------------------------------
+        cursor = conn.execute('PRAGMA table_info(users)')
+        user_cols = [row['name'] for row in cursor.fetchall()]
+        if 'education' not in user_cols:
+            conn.execute('ALTER TABLE users ADD COLUMN education TEXT')
+            print("Added education column to users table.")
+        if 'occupation' not in user_cols:
+            conn.execute('ALTER TABLE users ADD COLUMN occupation TEXT')
+            print("Added occupation column to users table.")
+        if 'residence' not in user_cols:
+            conn.execute('ALTER TABLE users ADD COLUMN residence TEXT')
+            print("Added residence column to users table.")
+
+        # -------------------------------------------------
         # FIX: primary_symptoms pain_score constraint (0-10 -> 0-19)
         # -------------------------------------------------
-        # Check if we need to migrate by inspecting sql (approximated) or just do it safely
-        # We can try to insert a dummy value > 10 in a transaction and see if it fails, then migrate?
-        # Or just checking if we already migrated. 
-        # Easier: Let's check table sql or just force migration if we haven't tracked it.
-        # Since we don't have a migration version table, we'll check schema.
-        
         cursor = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='primary_symptoms'")
         row = cursor.fetchone()
         if row and 'CHECK(pain_score BETWEEN 0 AND 10)' in row['sql']:
@@ -371,16 +453,20 @@ check_and_migrate_db()
 # **************** HELPER FUNCTIONS **********************************
 
 def validate_daily_entry_extended(data):
-    """Validate extended daily entry input (Updated Jan 2026)"""
-    # Relaxed validation to support new form. 
-    # Mandatory fields: entry_date
+    """Validate extended daily entry input (Updated Feb 2026)"""
     if 'entry_date' not in data:
         return False, 'Missing field: entry_date'
-    
+
+    # Critical fields — must exist for valid analysis (Spec Section 11.2)
+    critical_fields = ['pain_score', 'fatigue_score', 'sleep_quality']
+    for field in critical_fields:
+        if field not in data or data[field] is None:
+            return False, f'Missing critical field: {field}'
+
     # Check numeric bounds if fields are present
-    score_fields = ['pain_score', 'fatigue_score', 'stress_score', 'mood_score', 'sleep_quality', 
+    score_fields = ['pain_score', 'fatigue_score', 'stress_score', 'mood_score', 'sleep_quality',
                     'cognitive_difficulty', 'sensory_sensitivity_score']
-    
+
     try:
         for key in score_fields:
             if key in data and data[key] is not None:
@@ -390,7 +476,21 @@ def validate_daily_entry_extended(data):
     except (ValueError, TypeError):
         return False, 'Score fields must be numeric'
 
+    # Logical consistency check (Spec Section 13)
+    warnings = check_logical_consistency(data)
+
     return True, None
+
+
+def check_logical_consistency(data):
+    """Flag logically inconsistent entries (Spec Section 13)"""
+    warnings = []
+    sleep_cat = data.get('sleep_duration_category')
+    sleep_qual = data.get('sleep_quality')
+    if sleep_cat and sleep_qual is not None:
+        if sleep_cat == '<5' and float(sleep_qual) >= 9:
+            warnings.append('Inconsistent: sleep duration <5h but sleep quality >=9')
+    return warnings
 
 
 def login_required(f):
@@ -436,7 +536,7 @@ def validate_profile_payload(data):
 
     if sex and sex not in VALID_SEX:
         return False, f"Invalid sex value. Allowed: {', '.join(VALID_SEX)}"
-    if age_group and age_group not in VALID_AGE_GROPS:
+    if age_group and age_group not in VALID_AGE_GROUPS:
         return False, f"Invalid age_group. Allowed: {', '.join(VALID_AGE_GROUPS)}"
     if workload and workload not in VALID_WORKLOAD:
         return False, f"Invalid workload. Allowed: {', '.join(VALID_WORKLOAD)}"
@@ -639,7 +739,7 @@ def api_profile():
     user_id = session['user_id']
     conn = get_db_connection()
     if request.method == 'GET':
-        user = conn.execute('SELECT sex, age_group, comorbidities, family_history, menstrual_cycle, weather_sensitivity FROM users WHERE id = ?', (user_id,)).fetchone()
+        user = conn.execute('SELECT sex, age_group, comorbidities, family_history, menstrual_cycle, weather_sensitivity, education, occupation, residence FROM users WHERE id = ?', (user_id,)).fetchone()
         conn.close()
         if user is None:
             return jsonify({'error': 'User not found'}), 404
@@ -659,10 +759,13 @@ def api_profile():
     family_history = data.get('family_history')
     menstrual_cycle = data.get('menstrual_cycle')
     weather_sensitivity = data.get('weather_sensitivity')
+    education = data.get('education')
+    occupation = data.get('occupation')
+    residence = data.get('residence')
     with conn:
         conn.execute('''
-    UPDATE users SET sex=?, age_group=?, comorbidities=?, family_history=?, menstrual_cycle=?, weather_sensitivity=?, profile_complete=1 WHERE id=?
-    ''', (sex, age_group, comorbidities, family_history, menstrual_cycle, weather_sensitivity, user_id))
+    UPDATE users SET sex=?, age_group=?, comorbidities=?, family_history=?, menstrual_cycle=?, weather_sensitivity=?, education=?, occupation=?, residence=?, profile_complete=1 WHERE id=?
+    ''', (sex, age_group, comorbidities, family_history, menstrual_cycle, weather_sensitivity, education, occupation, residence, user_id))
     conn.close()
     return jsonify({'message': 'Profile updated successfully'})
 
@@ -1181,7 +1284,7 @@ def api_ai_suggestions():
         return jsonify({'error': 'Summary data required'}), 400
 
     try:
-        model_gemini = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""
         You are a medical assistant for Fibromyalgia patients.
         Here is the patient's summary data:
@@ -1237,7 +1340,7 @@ def api_dashboard_ai_suggestions():
 
     # Generate AI suggestions
     try:
-        model_gemini = genai.GenerativeModel('gemini-2.0-flash')
+        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""
         You are a medical assistant for Fibromyalgia patients.
         Here is the patient's recent 7-day summary:
@@ -1373,7 +1476,7 @@ def api_report_weekly():
     """
 
     try:
-        model_gemini = genai.GenerativeModel("gemini-2.0-flash")
+        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
         response = model_gemini.generate_content(ai_prompt)
         ai_advice = response.text
     except Exception as e:
@@ -1426,7 +1529,7 @@ def api_report_final():
     """
 
     try:
-        model_gemini = genai.GenerativeModel("gemini-2.0-flash")
+        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
         response = model_gemini.generate_content(ai_prompt)
         ai_advice = response.text
     except Exception as e:
@@ -1643,7 +1746,7 @@ def api_chat():
         return jsonify({'error': 'Message required'}), 400
 
     try:
-        model_gemini = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
         response = model_gemini.generate_content(message)
         chat_reply = response.text
     except Exception as e:
@@ -2157,6 +2260,11 @@ def api_save_screening():
         except Exception as e:
             print(f"⚠️ ML Prediction failed, using manual calculation: {e}")
 
+    # FiRST score consistency floor: score >= 5 cannot produce "Low" risk
+    if first_score >= 5 and risk_category == "Low":
+        risk_category = "Moderate"
+        print(f"⚠️ FiRST floor override: first_score={first_score} >= 5, bumping Low → Moderate")
+
     # Determine Eligibility (Rule-based safety net + risk)
     # User is eligible if High/Moderate risk AND meets ACR criteria (roughly)
     # ACR 2016: WPI >= 7 & SSS >= 5 OR WPI 3-6 & SSS >= 9
@@ -2228,8 +2336,8 @@ def api_save_screening():
             INSERT INTO screenings (
                 user_id, pain_regions, secondary_symptoms, primary_symptoms, 
                 duration, bmi, first_score, wpi_score, sss_score, 
-                meets_criteria, risk_level
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                meets_criteria, risk_level, risk_probability
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             user_id, 
             json.dumps(wpi_regions), 
@@ -2239,7 +2347,8 @@ def api_save_screening():
             None, 
             first_score, # Calculated score
             wpi_score, sss_score, 
-            is_eligible, risk_category
+            is_eligible, risk_category,
+            round(total_risk_score, 4)  # Store probability
         ))
 
         conn.commit()
@@ -2248,6 +2357,9 @@ def api_save_screening():
         return jsonify({'error': str(e)}), 500
     conn.close()
 
+    # Secondary evaluation score as percentage (0-100)
+    secondary_eval_score = round(modular_total_score * 100, 1)
+
     return jsonify({
         'message': 'Screening saved successfully',
         'result': {
@@ -2255,9 +2367,43 @@ def api_save_screening():
             'risk_probability': total_risk_score,
             'is_eligible': is_eligible,
             'wpi_score': wpi_score,
-            'sss_score': sss_score
+            'sss_score': sss_score,
+            'first_score': first_score,
+            'secondary_eval_score': secondary_eval_score
         }
     })
+
+@app.route('/api/screening/early-exit', methods=['POST'])
+@login_required
+def api_screening_early_exit():
+    """Save a partial screening record when FiRST score is below threshold."""
+    user_id = session['user_id']
+    data = request.json or {}
+    first_score = data.get('first_score', 0)
+
+    try:
+        conn = get_db_connection()
+        conn.execute('''
+            INSERT INTO screenings (
+                user_id, pain_regions, secondary_symptoms, primary_symptoms,
+                duration, bmi, first_score, wpi_score, sss_score,
+                meets_criteria, risk_level, risk_probability
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id,
+            json.dumps([]),  # no pain regions
+            json.dumps([]),  # no secondary symptoms
+            json.dumps({}),  # no primary symptoms
+            None, None,
+            first_score,
+            0, 0,  # wpi=0, sss=0
+            False, 'Low', 0.0
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Early exit screening saved'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/latest-screening', methods=['GET'])
 @login_required
@@ -2280,14 +2426,454 @@ def api_latest_screening():
     return jsonify(data)
 
 
+
+# **************** API ENDPOINTS - WEEKLY LOG (Clinical Scales) **********************************
+
+@app.route('/api/weekly-log', methods=['GET', 'POST'])
+@login_required
+def api_weekly_log():
+    """Manual weekly clinical scales input (PSQI, PSS, FSS) — Spec Section 4"""
+    user_id = session['user_id']
+
+    if request.method == 'GET':
+        conn = get_db_connection()
+        rows = conn.execute(
+            'SELECT * FROM weekly_log WHERE user_id = ? ORDER BY week_start_date DESC',
+            (user_id,)
+        ).fetchall()
+        conn.close()
+        return jsonify({'weekly_logs': [dict(r) for r in rows]})
+
+    # POST
+    data = request.json or {}
+    week_start_date = data.get('week_start_date')
+    if not week_start_date:
+        return jsonify({'error': 'week_start_date is required'}), 400
+
+    psqi_score = data.get('psqi_score')
+    pss_score = data.get('pss_score')
+    fss_score = data.get('fss_score')
+
+    conn = get_db_connection()
+    with conn:
+        conn.execute('''
+            INSERT INTO weekly_log (user_id, week_start_date, psqi_score, pss_score, fss_score)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, week_start_date, psqi_score, pss_score, fss_score))
+    conn.close()
+    return jsonify({'message': 'Weekly log saved successfully'})
+
+
+# **************** ANALYSIS & MONITORING ENGINE **********************************
+
+def compute_trend_slope(values):
+    """Compute linear trend slope from a list of numeric values."""
+    if not values or len(values) < 2:
+        return 0.0
+    x = np.arange(len(values), dtype=float)
+    y = np.array(values, dtype=float)
+    n = len(x)
+    denom = (n * np.sum(x**2) - np.sum(x)**2)
+    if denom == 0:
+        return 0.0
+    slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / denom
+    return round(float(slope), 4)
+
+
+def impute_daily_data(entries_dicts):
+    """Apply LOCF imputation for daily data (Spec Section 12).
+    - Numeric: carry forward last value, max 2 consecutive days
+    - Categorical: most frequent of past week
+    - NEVER impute: recent_infection, menstrual_phase
+    Returns list of dicts (imputed copies).
+    """
+    if not entries_dicts:
+        return []
+
+    numeric_fields = ['pain_score', 'fatigue_score', 'stress_score', 'mood_score',
+                      'sleep_quality', 'cognitive_difficulty', 'sensory_score']
+    categorical_fields = ['physical_activity_level', 'sleep_duration_category', 'workload']
+
+    result = []
+    last_known = {}
+    consec_missing = {}
+
+    for entry in entries_dicts:
+        row = dict(entry)
+
+        # Numeric LOCF (max 2)
+        for f in numeric_fields:
+            val = row.get(f)
+            if val is not None:
+                last_known[f] = val
+                consec_missing[f] = 0
+            else:
+                consec_missing[f] = consec_missing.get(f, 0) + 1
+                if consec_missing[f] <= 2 and f in last_known:
+                    row[f] = last_known[f]
+
+        # Categorical: most frequent of last 7
+        if len(result) >= 1:
+            from collections import Counter
+            window = result[-7:]
+            for f in categorical_fields:
+                val = row.get(f)
+                if val is None or val == '':
+                    freq = Counter(r.get(f) for r in window if r.get(f) is not None and r.get(f) != '')
+                    if freq:
+                        row[f] = freq.most_common(1)[0][0]
+
+        result.append(row)
+
+    return result
+
+
+def run_weekly_analysis(user_id):
+    """Run weekly analysis for a user (Spec Sections 6, 7, 11-15).
+    Computes metrics, classifies risk, detects flares/triggers, updates tracking.
+    Returns the analysis_result dict.
+    """
+    conn = get_db_connection()
+    try:
+        today = date.today()
+        week_end = today
+        week_start = today - timedelta(days=6)
+
+        rows = conn.execute('''
+            SELECT * FROM daily_entries
+            WHERE user_id = ? AND entry_date BETWEEN ? AND ?
+            ORDER BY entry_date
+        ''', (user_id, week_start.isoformat(), week_end.isoformat())).fetchall()
+
+        entries = [dict(r) for r in rows]
+        total_expected_days = 7
+        valid_entries = [e for e in entries if e.get('pain_score') is not None]
+        missing_days = total_expected_days - len(entries)
+        data_completeness = round(len(valid_entries) / total_expected_days, 2) if total_expected_days > 0 else 0
+
+        # Minimum data requirement: >= 4 valid daily entries (Spec Section 14)
+        if len(valid_entries) < 4:
+            result = {
+                'patient_id': user_id,
+                'period_start': week_start.isoformat(),
+                'period_end': week_end.isoformat(),
+                'mean_pain': None, 'pain_variability': None, 'trend_slope': None,
+                'flare_count': 0,
+                'weekly_risk_level': 'insufficient_data',
+                'consecutive_high_risk_weeks': 0, 'persistent_risk_flag': 0,
+                'cluster_label': None, 'dominant_trigger': None,
+                'final_risk_level': 'insufficient_data',
+                'recommendation': 'Insufficient data this week. Please log at least 4 days.',
+                'data_completeness_score': data_completeness,
+                'missing_days_count': missing_days
+            }
+            _save_analysis_result(conn, result)
+            return result
+
+        # Apply LOCF imputation
+        imputed = impute_daily_data(entries)
+
+        # Compute metrics
+        pain_vals = [e['pain_score'] for e in imputed if e.get('pain_score') is not None]
+        mean_pain = round(float(np.mean(pain_vals)), 2) if pain_vals else 0
+        pain_std = round(float(np.std(pain_vals)), 2) if len(pain_vals) >= 2 else 0
+        trend_slope = compute_trend_slope(pain_vals)
+
+        # Flare detection: pain > mean + 2*std (Spec Section 6.1)
+        flare_threshold = mean_pain + 2 * pain_std if pain_std > 0 else mean_pain + 1
+        flare_count = sum(1 for p in pain_vals if p > flare_threshold)
+
+        # Risk classification (Spec Section 6.2)
+        if data_completeness < 0.6:  # >40% missing => insufficient_data (Spec Section 15)
+            risk_level = 'insufficient_data'
+        elif mean_pain > 7 or flare_count >= 3:
+            risk_level = 'High'
+        elif mean_pain >= 4:
+            risk_level = 'Moderate'
+        else:
+            risk_level = 'Low'
+
+        # Persistence logic (Spec Section 6.3)
+        past_analyses = conn.execute('''
+            SELECT weekly_risk_level FROM analysis_result
+            WHERE patient_id = ? ORDER BY period_end DESC LIMIT 4
+        ''', (user_id,)).fetchall()
+
+        recent_risks = [r['weekly_risk_level'] for r in past_analyses]
+        all_risks = [risk_level] + recent_risks[:3]
+        high_count = sum(1 for r in all_risks if r == 'High')
+        persistent_risk = 1 if high_count >= 3 else 0
+
+        # Consecutive high risk weeks
+        consec_high = 0
+        for r in [risk_level] + recent_risks:
+            if r == 'High':
+                consec_high += 1
+            else:
+                break
+
+        # Trigger detection (Spec Section 6.4)
+        dominant_trigger = None
+        cluster_label = None
+        if persistent_risk:
+            dominant_trigger, cluster_label = _detect_triggers(conn, user_id)
+
+        final_risk = 'High' if persistent_risk else risk_level
+        recommendation = _generate_recommendation(final_risk, dominant_trigger, mean_pain, flare_count)
+
+        result = {
+            'patient_id': user_id,
+            'period_start': week_start.isoformat(),
+            'period_end': week_end.isoformat(),
+            'mean_pain': mean_pain, 'pain_variability': pain_std,
+            'trend_slope': trend_slope, 'flare_count': flare_count,
+            'weekly_risk_level': risk_level,
+            'consecutive_high_risk_weeks': consec_high,
+            'persistent_risk_flag': persistent_risk,
+            'cluster_label': cluster_label, 'dominant_trigger': dominant_trigger,
+            'final_risk_level': final_risk, 'recommendation': recommendation,
+            'data_completeness_score': data_completeness,
+            'missing_days_count': missing_days
+        }
+
+        _save_analysis_result(conn, result)
+        _update_tracking_status(conn, user_id, risk_level, recent_risks)
+
+        return result
+    finally:
+        conn.close()
+
+
+def _save_analysis_result(conn, result):
+    """Insert an analysis result row."""
+    with conn:
+        conn.execute('''
+            INSERT INTO analysis_result
+            (patient_id, period_start, period_end, mean_pain, pain_variability,
+             trend_slope, flare_count, weekly_risk_level, consecutive_high_risk_weeks,
+             persistent_risk_flag, cluster_label, dominant_trigger, final_risk_level,
+             recommendation, data_completeness_score, missing_days_count)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            result['patient_id'], result['period_start'], result['period_end'],
+            result['mean_pain'], result['pain_variability'], result['trend_slope'],
+            result['flare_count'], result['weekly_risk_level'],
+            result['consecutive_high_risk_weeks'], result['persistent_risk_flag'],
+            result['cluster_label'], result['dominant_trigger'],
+            result['final_risk_level'], result['recommendation'],
+            result['data_completeness_score'], result['missing_days_count']
+        ))
+
+
+def _detect_triggers(conn, user_id):
+    """Detect dominant trigger via clustering (Spec Section 6.4).
+    Uses last 2+ weeks of daily data.
+    Returns (dominant_trigger_str, cluster_label_int).
+    """
+    rows = conn.execute('''
+        SELECT stress_score, sleep_quality, weather_sensitivity_bool,
+               sensory_score, recent_infection, menstrual_phase,
+               cognitive_difficulty, mood_score
+        FROM daily_entries
+        WHERE user_id = ? AND entry_date >= date('now', '-14 days')
+        ORDER BY entry_date
+    ''', (user_id,)).fetchall()
+
+    if len(rows) < 7:
+        return None, None
+
+    features = []
+    for r in rows:
+        features.append([
+            float(r['stress_score'] or 0),
+            float(10 - (r['sleep_quality'] or 5)),  # invert: higher = worse sleep
+            float(r['weather_sensitivity_bool'] or 0) * 5,
+            float(r['sensory_score'] or 0),
+            float(r['recent_infection'] or 0) * 10,
+            float(1 if r['menstrual_phase'] and r['menstrual_phase'] not in ('NA', 'N/A') else 0) * 5,
+        ])
+
+    X = np.array(features)
+
+    trigger_names = ['stress_related', 'sleep_related', 'weather_related',
+                     'psychological', 'infection_related', 'hormonal']
+    mean_scores = X.mean(axis=0)
+    dominant_idx = int(np.argmax(mean_scores))
+    dominant_trigger = trigger_names[dominant_idx]
+
+    try:
+        from sklearn.cluster import KMeans
+        kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
+        labels = kmeans.fit_predict(X)
+        cluster_label = int(labels[-1])
+    except ImportError:
+        cluster_label = dominant_idx
+
+    return dominant_trigger, cluster_label
+
+
+def _generate_recommendation(risk_level, dominant_trigger, mean_pain, flare_count):
+    """Generate a text recommendation based on analysis."""
+    if risk_level == 'insufficient_data':
+        return 'Insufficient data to assess risk. Please ensure daily logging.'
+
+    parts = []
+    if risk_level == 'High':
+        parts.append(f'High risk detected (mean pain: {mean_pain}, flares: {flare_count}).')
+        if dominant_trigger:
+            trigger_advice = {
+                'stress_related': 'Consider stress management techniques (mindfulness, CBT).',
+                'sleep_related': 'Focus on sleep hygiene — consistent schedule, limit screens before bed.',
+                'weather_related': 'Monitor weather changes and plan activity accordingly.',
+                'psychological': 'Consider mental health support — consult a therapist.',
+                'infection_related': 'Recent infections may be contributing. Consult your physician.',
+                'hormonal': 'Hormonal factors detected. Discuss with your healthcare provider.'
+            }
+            parts.append(f'Dominant trigger: {dominant_trigger}.')
+            parts.append(trigger_advice.get(dominant_trigger, ''))
+        parts.append('Recommend clinical follow-up.')
+    elif risk_level == 'Moderate':
+        parts.append(f'Moderate risk (mean pain: {mean_pain}).')
+        parts.append('Continue monitoring and maintain healthy routines.')
+    else:
+        parts.append('Low risk. Symptoms are well-controlled.')
+        parts.append('Continue current management.')
+
+    return ' '.join(parts)
+
+
+def _update_tracking_status(conn, user_id, current_risk, recent_risks):
+    """Update tracking_status table (Spec Section 7)."""
+    ts = conn.execute('SELECT * FROM tracking_status WHERE patient_id = ?', (user_id,)).fetchone()
+
+    all_risks = [current_risk] + list(recent_risks)
+
+    if ts is None:
+        with conn:
+            conn.execute('''
+                INSERT INTO tracking_status (patient_id, tracking_active, monitoring_start_date, weeks_observed, stable_low_weeks_count, tracking_stage)
+                VALUES (?, 1, date('now'), 1, ?, 'monitoring')
+            ''', (user_id, 1 if current_risk == 'Low' else 0))
+        return
+
+    weeks_observed = (ts['weeks_observed'] or 0) + 1
+
+    consec_low = 0
+    for r in all_risks:
+        if r == 'Low':
+            consec_low += 1
+        else:
+            break
+
+    tracking_active = 1
+    tracking_stage = 'monitoring'
+
+    if consec_low >= 3:
+        tracking_active = 0
+        tracking_stage = 'completed'
+    elif sum(1 for r in all_risks[:4] if r == 'High') >= 3:
+        tracking_stage = 'trigger_analysis'
+
+    with conn:
+        conn.execute('''
+            UPDATE tracking_status
+            SET tracking_active = ?, weeks_observed = ?, stable_low_weeks_count = ?,
+                tracking_stage = ?, monitoring_end_date = CASE WHEN ? = 0 THEN date('now') ELSE monitoring_end_date END
+            WHERE patient_id = ?
+        ''', (tracking_active, weeks_observed, consec_low, tracking_stage, tracking_active, user_id))
+
+
+# **************** API ENDPOINTS - ANALYSIS & RISK **********************************
+
+@app.route('/api/run-analysis', methods=['POST'])
+@login_required
+def api_run_analysis():
+    """Manually trigger weekly analysis for the logged-in user."""
+    user_id = session['user_id']
+    result = run_weekly_analysis(user_id)
+    return jsonify(result)
+
+
+@app.route('/api/risk-status/<int:patient_id>', methods=['GET'])
+@login_required
+def api_risk_status(patient_id):
+    """Get latest risk status for a patient (Spec Section 9)."""
+    conn = get_db_connection()
+    try:
+        analysis = conn.execute('''
+            SELECT * FROM analysis_result
+            WHERE patient_id = ? ORDER BY period_end DESC LIMIT 1
+        ''', (patient_id,)).fetchone()
+
+        tracking = conn.execute('''
+            SELECT * FROM tracking_status WHERE patient_id = ?
+        ''', (patient_id,)).fetchone()
+
+        if not analysis:
+            return jsonify({'message': 'No analysis data available. Run analysis first.'}), 404
+
+        return jsonify({
+            'risk_level': analysis['final_risk_level'],
+            'weekly_risk_level': analysis['weekly_risk_level'],
+            'persistent_risk': bool(analysis['persistent_risk_flag']),
+            'mean_pain': analysis['mean_pain'],
+            'flare_count': analysis['flare_count'],
+            'dominant_trigger': analysis['dominant_trigger'],
+            'recommendation': analysis['recommendation'],
+            'data_completeness': analysis['data_completeness_score'],
+            'period': {'start': analysis['period_start'], 'end': analysis['period_end']},
+            'tracking': {
+                'active': bool(tracking['tracking_active']) if tracking else True,
+                'stage': tracking['tracking_stage'] if tracking else 'monitoring',
+                'weeks_observed': tracking['weeks_observed'] if tracking else 0
+            } if tracking else None
+        })
+    finally:
+        conn.close()
+
+
+@app.route('/api/analysis/<int:patient_id>', methods=['GET'])
+@login_required
+def api_analysis_history(patient_id):
+    """Get full analysis history for a patient (Spec Section 9)."""
+    conn = get_db_connection()
+    try:
+        rows = conn.execute('''
+            SELECT * FROM analysis_result
+            WHERE patient_id = ? ORDER BY period_end DESC
+        ''', (patient_id,)).fetchall()
+
+        if not rows:
+            return jsonify({'message': 'No analysis data available.', 'analyses': []})
+
+        analyses = []
+        for r in rows:
+            analyses.append({
+                'analysis_id': r['analysis_id'],
+                'period_start': r['period_start'],
+                'period_end': r['period_end'],
+                'mean_pain': r['mean_pain'],
+                'pain_variability': r['pain_variability'],
+                'trend_slope': r['trend_slope'],
+                'flare_count': r['flare_count'],
+                'weekly_risk_level': r['weekly_risk_level'],
+                'persistent_risk_flag': bool(r['persistent_risk_flag']),
+                'dominant_trigger': r['dominant_trigger'],
+                'final_risk_level': r['final_risk_level'],
+                'recommendation': r['recommendation'],
+                'data_completeness_score': r['data_completeness_score'],
+                'missing_days_count': r['missing_days_count']
+            })
+
+        return jsonify({'analyses': analyses})
+    finally:
+        conn.close()
+
+
 if __name__ == '__main__':
     print("Starting FibroTracker Flask backend...")
     print("Landing page: http://localhost:5000/")
     app.run(debug=True)
-
-
-
-
 
 
 
