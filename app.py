@@ -6,7 +6,6 @@ from flask_cors import CORS
 import json
 import numpy as np
 import joblib
-import google.generativeai as genai
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import io
@@ -20,8 +19,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_super_secret_key_change_in_production')
 CORS(app)
 
-# Configure Gemini API
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 # -------------------------------------------------
 # Load ML Models
@@ -636,11 +633,6 @@ def report_page():
     """Reports page"""
     return render_template('report.html')
 
-@app.route('/chat-page')
-@login_required
-def chat_page():
-    """Gemini chatbot page"""
-    return render_template('chat.html')
 
 @app.route('/about')
 def about_page():
@@ -1262,100 +1254,6 @@ def api_dashboard_daily():
         })
     return jsonify(result)
 
-@app.route('/api/ai-suggestions', methods=['POST'])
-@login_required
-def api_ai_suggestions():
-    """
-    Expects JSON input like:
-    {
-        "summary": {
-            "average_pain": 4.5,
-            "average_fatigue": 6,
-            "average_sleep": 5,
-            "average_stress": 7,
-            "average_mood": 3
-        }
-    }
-    Returns AI-generated suggestions as JSON.
-    """
-    data = request.json
-    summary = data.get('summary')
-    if not summary:
-        return jsonify({'error': 'Summary data required'}), 400
-
-    try:
-        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
-        prompt = f"""
-        You are a medical assistant for Fibromyalgia patients.
-        Here is the patient's summary data:
-        {json.dumps(summary, indent=2)}
-        Based on this, give personalized advice for stress, sleep, pain, and fatigue.
-        Return short, actionable recommendations.
-        """
-        response = model_gemini.generate_content(prompt)
-        ai_advice = response.text
-        return jsonify({'advice': ai_advice})
-    except Exception as e:
-        return jsonify({'advice': f"AI suggestions unavailable: {str(e)}"}), 500
-    
-@app.route('/api/dashboard/ai-suggestions', methods=['GET'])
-@login_required
-def api_dashboard_ai_suggestions():
-    """
-    Fetches recent weekly averages and returns AI suggestions
-    """
-    user_id = session['user_id']
-    conn = get_db_connection()
-    # Fetch last 7 days
-    entries = conn.execute(
-        'SELECT * FROM daily_entries WHERE user_id = ? ORDER BY entry_date DESC LIMIT 7',
-        (user_id,)
-    ).fetchall()
-    conn.close()
-
-    if not entries:
-        return jsonify({'error': 'No recent data to generate AI suggestions'}), 404
-
-    # Compute simple averages
-    total_pain = total_fatigue = total_sleep = total_stress = total_mood = 0
-    count = 0
-    for e in entries:
-        entry = dict(e)  # ✅ convert sqlite3.Row -> dict
-
-        sss = json.loads(entry['sss']) if entry.get('sss') else {}
-        total_pain += entry.get('pain_score', 0) or 0
-        total_fatigue += sss.get('fatigue', 0)
-        total_sleep += sss.get('sleep', 0)
-        total_stress += entry.get('stress_score', 0) or 0
-        total_mood += entry.get('mood_score', 0) or 0
-        count += 1
-
-    recent_summary = {
-        "average_pain": round(total_pain / count, 2),
-        "average_fatigue": round(total_fatigue / count, 2),
-        "average_sleep": round(total_sleep / count, 2),
-        "average_stress": round(total_stress / count, 2),
-        "average_mood": round(total_mood / count, 2),
-    }
-
-    # Generate AI suggestions
-    try:
-        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
-        prompt = f"""
-        You are a medical assistant for Fibromyalgia patients.
-        Here is the patient's recent 7-day summary:
-        {json.dumps(recent_summary, indent=2)}
-        Provide short actionable advice for stress, sleep, pain, and fatigue.
-        """
-        response = model_gemini.generate_content(prompt)
-        ai_advice = response.text
-    except Exception as e:
-        ai_advice = f"AI suggestions unavailable: {str(e)}"
-
-    return jsonify({
-        "recent_summary": recent_summary,
-        "ai_advice": ai_advice
-    })
 @app.route('/api/dashboard/weekly', methods=['GET'])
 @login_required
 def api_dashboard_weekly():
@@ -1733,26 +1631,6 @@ def save_monthly_entry():
         print(f"Error saving monthly assessment: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
-# **************** API ENDPOINTS - CHATBOT **********************************
-
-@app.route('/api/chat', methods=['POST'])
-def api_chat():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    data = request.json
-    message = data.get('message')
-    if not message:
-        return jsonify({'error': 'Message required'}), 400
-
-    try:
-        model_gemini = genai.GenerativeModel('gemini-2.5-flash')
-        response = model_gemini.generate_content(message)
-        chat_reply = response.text
-    except Exception as e:
-        return jsonify({'error': f'Gemini API error: {str(e)}'}), 500
-
-    return jsonify({'response': chat_reply})
 
 # **************** API ENDPOINTS - REPORTS **********************************
 
