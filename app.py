@@ -1943,6 +1943,12 @@ def api_save_screening():
 
     # 1. Extract Data
     first_answers = data.get('first_answers', {})
+    # Calculate FiRST score early (needed for risk floor override later)
+    first_score = 0
+    for i in range(1, 7):
+        if first_answers.get(f'f{i}'):
+            first_score += 1
+
     wpi_regions = data.get('wpi_regions', [])
     sss_answers = data.get('sss_answers', {})
     sss_somatic = data.get('sss_somatic', {})
@@ -2200,13 +2206,6 @@ def api_save_screening():
             INSERT INTO screening_result (user_id, risk_probability, risk_category, screening_status)
             VALUES (?, ?, ?, ?)
         ''', (user_id, total_risk_score, risk_category, "Completed"))
-
-        # Calculate FiRST Score
-        # Score is number of 'yes' answers in f1..f6
-        first_score = 0
-        for i in range(1, 7):
-            if first_answers.get(f'f{i}'):
-                first_score += 1
 
         # Also update 'screenings' summary table for backward compatibility / profile view
         # We'll map "meets_criteria" to "is_eligible" logic
