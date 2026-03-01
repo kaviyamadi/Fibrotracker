@@ -2,3 +2,4 @@
 .venv
 fibro_risk_model.pkl
 dataset
+fibrotracker.db
