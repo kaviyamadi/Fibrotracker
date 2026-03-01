@@ -14,6 +14,11 @@ from datetime import datetime, timedelta, date
 import pandas as pd
 import requests
 
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_super_secret_key_change_in_production')
@@ -75,6 +80,7 @@ def init_db():
             profile_complete INTEGER DEFAULT 0 CHECK(profile_complete IN (0,1)),
             sex TEXT CHECK(sex IN ('Male', 'Female', 'Other')),
             age_group TEXT CHECK(age_group IN ('18-25', '26-35', '36-45', '46-55', '56-65', '65+')),
+            comorbidities TEXT,
             family_history TEXT CHECK(family_history IN ('Yes', 'No')),
             menstrual_cycle TEXT CHECK(menstrual_cycle IN ('N/A', 'Regular', 'Irregular', 'Postmenopausal')),
             weather_sensitivity TEXT CHECK(weather_sensitivity IN ('None', 'Low', 'Moderate', 'High'))
@@ -398,6 +404,9 @@ def check_and_migrate_db():
         # -------------------------------------------------
         cursor = conn.execute('PRAGMA table_info(users)')
         user_cols = [row['name'] for row in cursor.fetchall()]
+        if 'comorbidities' not in user_cols:
+            conn.execute('ALTER TABLE users ADD COLUMN comorbidities TEXT')
+            print("Added comorbidities column to users table.")
         if 'education' not in user_cols:
             conn.execute('ALTER TABLE users ADD COLUMN education TEXT')
             print("Added education column to users table.")
@@ -488,6 +497,24 @@ def check_logical_consistency(data):
         if sleep_cat == '<5' and float(sleep_qual) >= 9:
             warnings.append('Inconsistent: sleep duration <5h but sleep quality >=9')
     return warnings
+
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+if genai and GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+
+
+def generate_ai_advice(ai_prompt):
+    if not genai:
+        return 'AI advice unavailable: google-generativeai package is not installed.'
+    if not GEMINI_API_KEY:
+        return 'AI advice unavailable: GEMINI_API_KEY is not configured.'
+    try:
+        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
+        response = model_gemini.generate_content(ai_prompt)
+        return response.text
+    except Exception as e:
+        return f"AI generation failed: {str(e)}"
 
 
 def login_required(f):
@@ -1373,12 +1400,7 @@ def api_report_weekly():
     Give concise personalized suggestions to improve symptoms.
     """
 
-    try:
-        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
-        response = model_gemini.generate_content(ai_prompt)
-        ai_advice = response.text
-    except Exception as e:
-        ai_advice = f"AI generation failed: {str(e)}"
+    ai_advice = generate_ai_advice(ai_prompt)
 
     report = {
         'week_number': week_number,
@@ -1426,12 +1448,7 @@ def api_report_final():
     Provide personalized advice for stress, sleep, pain, fatigue and overall recommendations.
     """
 
-    try:
-        model_gemini = genai.GenerativeModel("gemini-2.5-flash")
-        response = model_gemini.generate_content(ai_prompt)
-        ai_advice = response.text
-    except Exception as e:
-        ai_advice = f"AI generation failed: {str(e)}"
+    ai_advice = generate_ai_advice(ai_prompt)
 
     final_report = {
         'profile': dict(user_profile),
