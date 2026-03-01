@@ -519,6 +519,24 @@
 
     /* ---------- FiRST RESULT ---------- */
     function showFirstResult() {
+        // Validate that all FiRST questions are answered
+        let allAnswered = true;
+        for (let i = 1; i <= 6; i++) {
+            let answered = false;
+            for (let r of document.getElementsByName('f' + i)) {
+                if (r.checked) answered = true;
+            }
+            if (!answered) {
+                allAnswered = false;
+                break;
+            }
+        }
+
+        if (!allAnswered) {
+            showToast("Please answer all questions (Yes or No) before proceeding.", "error");
+            return;
+        }
+
         // Calculate FiRST score from the 6 yes/no questions
         let score = 0;
         for (let i = 1; i <= 6; i++) {
