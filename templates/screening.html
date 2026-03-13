@@ -561,7 +561,7 @@
             exitMsg.classList.add('hidden');
             noteEl.classList.remove('hidden');
         } else {
-            // FAIL — exit screening
+            // Fail — exit screening
             if (score >= 3) {
                 interpEl.innerHTML = '<span class="interp-badge interp-moderate"><i class="fas fa-info-circle"></i> Moderate Likelihood</span><p>Your score does not meet the threshold (5/6) required for further evaluation.</p>';
             } else {
@@ -572,11 +572,24 @@
             noteEl.classList.add('hidden');
             document.getElementById('progressBar').style.display = 'none';
 
+            // Gather FiRST individual answers
+            const first = {};
+            for (let i = 1; i <= 6; i++) {
+                let val = false;
+                for (let r of document.getElementsByName('f' + i)) {
+                    if (r.checked && r.value === 'yes') val = true;
+                }
+                first['f' + i] = val;
+            }
+
             // Save early-exit result to DB so profile page updates
             fetch('/api/screening/early-exit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ first_score: score })
+                body: JSON.stringify({ 
+                    first_score: score,
+                    first_answers: first
+                })
             }).catch(err => console.error('Early exit save failed:', err));
         }
         goToStep(2);

@@ -2245,6 +2245,21 @@ def api_save_screening():
             round(total_risk_score, 4)  # Store probability
         ))
 
+        # Table 6: first_tool (save explicit FiRST tool answers)
+        conn.execute('''
+            INSERT INTO first_tool (user_id, widespread_pain, fatigue, pain_type, unusual_sensations, other_health_problems, impact_on_life, total_score)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id,
+            1 if first_answers.get('f1') else 0,
+            1 if first_answers.get('f2') else 0,
+            1 if first_answers.get('f3') else 0,
+            1 if first_answers.get('f4') else 0,
+            1 if first_answers.get('f5') else 0,
+            1 if first_answers.get('f6') else 0,
+            first_score
+        ))
+
         conn.commit()
     except Exception as e:
         conn.close()
@@ -2274,6 +2289,7 @@ def api_screening_early_exit():
     user_id = session['user_id']
     data = request.json or {}
     first_score = data.get('first_score', 0)
+    first_answers = data.get('first_answers', {})
 
     try:
         conn = get_db_connection()
@@ -2293,6 +2309,22 @@ def api_screening_early_exit():
             0, 0,  # wpi=0, sss=0
             False, 'Low', 0.0
         ))
+        
+        # Save explicit FiRST tool answers
+        conn.execute('''
+            INSERT INTO first_tool (user_id, widespread_pain, fatigue, pain_type, unusual_sensations, other_health_problems, impact_on_life, total_score)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id,
+            1 if first_answers.get('f1') else 0,
+            1 if first_answers.get('f2') else 0,
+            1 if first_answers.get('f3') else 0,
+            1 if first_answers.get('f4') else 0,
+            1 if first_answers.get('f5') else 0,
+            1 if first_answers.get('f6') else 0,
+            first_score
+        ))
+
         conn.commit()
         conn.close()
         return jsonify({'success': True, 'message': 'Early exit screening saved'})
