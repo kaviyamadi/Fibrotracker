@@ -1,147 +1,269 @@
 {% extends "base.html" %}
 
-{% block title %}Reports - FibroTracker{% endblock %}
+{% block title %}Report Template - FibroTracker{% endblock %}
 
 {% block content %}
-<div class="report-page">
-    <h1><i class="fas fa-file-alt"></i> Health Reports</h1>
+<div class="report-template-wrapper" style="max-width: 900px; margin: 2rem auto; font-family: 'Inter', sans-serif; background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+    
+    <!-- Title -->
+    <h1 style="text-align: center; color: #1e3a8a; margin-bottom: 3rem; font-size: 2.2rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1.5rem; font-weight: 800;">
+        📄 WEEKLY / MONTHLY REPORT TEMPLATE
+    </h1>
 
-    <div class="report-section glass">
-        <h2>Weekly Reports</h2>
-        <div class="form-group">
-            <label for="week-selector">Select Week</label>
-            <select id="week-selector">
-                <!-- Populated dynamically -->
-            </select>
+    <!-- 1. Patient Details -->
+    <div style="margin-bottom: 2.5rem;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 1. Patient Details
+        </h2>
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; font-size: 1.1rem;">
+            <div><strong style="color: #1e293b;">Patient ID:</strong> <span id="rep-patient-id" style="color: #475569;">______</span></div>
+            <div>
+                <strong style="color: #1e293b;">Report Type:</strong> 
+                <select id="rep-type" style="padding: 0.35rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: 'Inter', sans-serif; font-size: 1rem; outline: none;">
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                </select>
+            </div>
+            <div style="grid-column: span 2;"><strong style="color: #1e293b;">Time Period:</strong> <span id="rep-time-period" style="color: #475569;">______</span></div>
         </div>
-        <div class="button-group">
-            <button onclick="viewWeeklyReport()" class="btn btn-secondary">
-                <i class="fas fa-eye"></i> View Report
-            </button>
-            <button onclick="exportWeeklyExcel()" class="btn btn-primary">
-                <i class="fas fa-file-excel"></i> Export Excel
-            </button>
-            <button onclick="exportWeeklyPDF()" class="btn btn-primary">
-                <i class="fas fa-file-pdf"></i> Export PDF
-            </button>
-        </div>
-        <div id="weekly-report-display"></div>
     </div>
 
-    <div class="report-section glass">
-        <h2>Final 3-Month Report</h2>
-        <div class="button-group">
-            <button onclick="viewFinalReport()" class="btn btn-secondary">
-                <i class="fas fa-eye"></i> View Report
-            </button>
-            <button onclick="exportFinalExcel()" class="btn btn-primary">
-                <i class="fas fa-file-excel"></i> Export Excel
-            </button>
-            <button onclick="exportFinalPDF()" class="btn btn-primary">
-                <i class="fas fa-file-pdf"></i> Export PDF
-            </button>
+    <!-- 2. Symptom Summary -->
+    <div style="margin-bottom: 2.5rem;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 2. Symptom Summary
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+            <div style="background: #fef2f2; padding: 1.5rem; border-radius: 10px; border: 1px solid #fca5a5; text-align: center; box-shadow: 0 2px 4px rgba(254,226,226,0.3);">
+                <div style="font-weight: 600; color: #991b1b; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;">Average Pain</div>
+                <div id="rep-avg-pain" style="font-size: 1.8rem; font-weight: 800; color: #7f1d1d;">______</div>
+            </div>
+            <div style="background: #fff7ed; padding: 1.5rem; border-radius: 10px; border: 1px solid #fdba74; text-align: center; box-shadow: 0 2px 4px rgba(255,237,213,0.3);">
+                <div style="font-weight: 600; color: #9a3412; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;">Fatigue Level</div>
+                <div id="rep-fatigue" style="font-size: 1.8rem; font-weight: 800; color: #7c2d12;">Moderate</div>
+            </div>
+            <div style="background: #f0fdf4; padding: 1.5rem; border-radius: 10px; border: 1px solid #86efac; text-align: center; box-shadow: 0 2px 4px rgba(220,252,231,0.3);">
+                <div style="font-weight: 600; color: #166534; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;">Sleep Quality</div>
+                <div id="rep-sleep" style="font-size: 1.8rem; font-weight: 800; color: #14532d;">Good</div>
+            </div>
         </div>
-        <div id="final-report-display"></div>
     </div>
+
+    <!-- 3. Trend Analysis -->
+    <div style="margin-bottom: 2.5rem; background: #f8fafc; padding: 2rem; border-radius: 10px; border-left: 5px solid #3b82f6;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 3. Trend Analysis
+        </h2>
+        <ul style="list-style-type: none; padding: 0; margin-bottom: 1.5rem; font-size: 1.15rem; color: #334155;">
+            <li style="margin-bottom: 0.75rem;"><strong style="color: #1e293b;">Pain Trend:</strong> <span id="rep-pain-trend" style="font-weight: 500;">Stable</span></li>
+            <li><strong style="color: #1e293b;">Sleep Trend:</strong> <span id="rep-sleep-trend" style="font-weight: 500;">Improving</span></li>
+        </ul>
+        <div style="background: #eff6ff; padding: 1.25rem; border-radius: 8px; color: #1e40af; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
+            <span style="font-size: 1.4rem;">👉</span> “Overall trend indicates <strong id="rep-overall-trend" style="text-decoration: underline; margin: 0 0.4rem;">______</strong> condition.”
+        </div>
+    </div>
+
+    <!-- 4. Flare Analysis -->
+    <div style="margin-bottom: 2.5rem; background: #fff1f2; padding: 2rem; border-radius: 10px; border-left: 5px solid #e11d48;">
+        <h2 style="color: #e11d48; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #fda4af;">🔹</span> 4. Flare Analysis
+        </h2>
+        <div style="font-size: 1.15rem; color: #334155; margin-bottom: 1.5rem;">
+            <strong style="color: #1e293b;">Number of Flares:</strong> <span id="rep-flares" style="font-weight: 800; font-size: 1.5rem; color: #be123c;">0</span>
+        </div>
+        <div style="background: #ffe4e6; padding: 1.25rem; border-radius: 8px; color: #9f1239; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
+            <span style="font-size: 1.4rem;">👉</span> “Flare-ups indicate sudden worsening of symptoms.”
+        </div>
+    </div>
+
+    <!-- 5. Risk Assessment -->
+    <div style="margin-bottom: 2.5rem;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 5. Risk Assessment
+        </h2>
+        <div style="display: flex; gap: 3rem; margin-bottom: 1.5rem; font-size: 1.15rem; color: #334155; padding: 0 1rem;">
+            <div><strong style="color: #1e293b;">Weekly Risk Level:</strong> <span id="rep-weekly-risk" style="font-weight: 600;">Moderate</span></div>
+            <div><strong style="color: #1e293b;">Final Risk Level:</strong> <span id="rep-final-risk" style="font-weight: 600;">______</span></div>
+        </div>
+        <div style="background: #f1f5f9; padding: 1.25rem; border-radius: 8px; color: #334155; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
+            <span style="font-size: 1.4rem;">👉</span> “Risk level is determined based on symptom severity and consistency.”
+        </div>
+    </div>
+
+    <!-- 6. Trigger Insight -->
+    <div style="margin-bottom: 2.5rem;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 6. Trigger Insight
+        </h2>
+        <div style="font-size: 1.15rem; color: #334155; margin-bottom: 1.5rem; padding: 0 1rem;">
+            <strong style="color: #1e293b;">Dominant Trigger:</strong> <span id="rep-trigger" style="font-weight: 600;">Stress</span>
+        </div>
+        <div style="background: #f1f5f9; padding: 1.25rem; border-radius: 8px; color: #334155; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
+            <span style="font-size: 1.4rem;">👉</span> “This suggests that <strong id="rep-trigger-name" style="text-decoration: underline; margin: 0 0.4rem;">______</strong> is influencing symptom severity.”
+        </div>
+    </div>
+
+    <!-- 7. Persistence Status -->
+    <div style="margin-bottom: 2.5rem;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 7. Persistence Status
+        </h2>
+        <div style="font-size: 1.15rem; color: #334155; margin-bottom: 1.5rem; padding: 0 1rem;">
+            <strong style="color: #1e293b;">Persistent Risk:</strong> <span id="rep-persistent" style="font-weight: 600;">No</span>
+        </div>
+        <div id="rep-persist-msg" style="background: #f1f5f9; padding: 1.25rem; border-radius: 8px; color: #334155; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
+            <span style="font-size: 1.4rem;">👉</span> “Symptoms are consistently elevated over time.”
+        </div>
+    </div>
+
+    <!-- 8. Recommendation -->
+    <div style="margin-bottom: 1rem;">
+        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #93c5fd;">🔹</span> 8. Recommendation
+        </h2>
+        <ul style="background: #f0fdf4; padding: 2rem 2rem 2rem 3rem; border-radius: 10px; border: 1px solid #bbf7d0; color: #166534; font-size: 1.15rem; line-height: 1.8; margin: 0; box-shadow: 0 2px 5px rgba(220,252,231,0.5);">
+            <li>Improve sleep routine <span style="font-size: 1.3rem; margin-left: 0.5rem;">🌙</span></li>
+            <li>Reduce stress levels <span style="font-size: 1.3rem; margin-left: 0.5rem;">🧘</span></li>
+            <li>Maintain regular physical activity <span style="font-size: 1.3rem; margin-left: 0.5rem;">🚶</span></li>
+        </ul>
+    </div>
+    
+    <!-- Print Button -->
+    <div style="text-align: center; margin-top: 4rem;">
+         <button onclick="window.print()" style="background: #1e3a8a; color: white; border: none; padding: 1rem 2.5rem; font-size: 1.15rem; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; transition: background 0.2s; box-shadow: 0 4px 6px rgba(30, 58, 138, 0.3);">
+             <i class="fas fa-print"></i> Print / Save as PDF
+         </button>
+    </div>
+
 </div>
 
 <script>
-async function loadWeekOptions() {
-    try {
-        const response = await fetch('/api/dashboard/weekly');
-        const data = await response.json();
-        
-        const selector = document.getElementById('week-selector');
-        selector.innerHTML = data.map(w => 
-            `<option value="${w.week_number}">Week ${w.week_number} (${w.week_start} to ${w.week_end})</option>`
-        ).join('');
-    } catch (error) {
-        console.error('Error loading weeks:', error);
+    async function initReport() {
+        try {
+            // Patient ID Logic
+            const profileRes = await fetch('/api/profile');
+            if(profileRes.ok) {
+                const profile = await profileRes.json();
+                document.getElementById('rep-patient-id').textContent = 'PT-' + String(profile.id || '001').padStart(4, '0');
+            }
+
+            const timeframe = document.getElementById('rep-type').value; 
+            const days = timeframe === 'Weekly' ? 7 : 30;
+            
+            const d = new Date();
+            const dateString = d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+            document.getElementById('rep-time-period').textContent = `Ending ${dateString} (${days} Days)`;
+
+            const res = await fetch('/api/dashboard/daily');
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    const recent = data.slice(-days);
+                    
+                    // Averages
+                    const validPains = recent.filter(d => d.pain_score != null).map(d => parseFloat(d.pain_score));
+                    const meanPain = validPains.length > 0 ? (validPains.reduce((a,b)=>a+b, 0) / validPains.length) : 0;
+                    document.getElementById('rep-avg-pain').textContent = meanPain.toFixed(1);
+
+                    const validFatigue = recent.filter(d => d.fatigue != null).map(d => parseFloat(d.fatigue));
+                    const meanFatigue = validFatigue.length > 0 ? (validFatigue.reduce((a,b)=>a+b, 0) / validFatigue.length) : 0;
+                    document.getElementById('rep-fatigue').textContent = meanFatigue > 6 ? 'High' : (meanFatigue > 3 ? 'Moderate' : 'Low');
+
+                    const validSleep = recent.filter(d => d.sleep != null).map(d => parseFloat(d.sleep));
+                    const meanSleep = validSleep.length > 0 ? (validSleep.reduce((a,b)=>a+b, 0) / validSleep.length) : 0;
+                    document.getElementById('rep-sleep').textContent = meanSleep < 4 ? 'Poor' : (meanSleep < 7 ? 'Moderate' : 'Good');
+
+                    // Trends
+                    const half = Math.floor(validPains.length/2);
+                    const firstHalf = validPains.slice(0, half);
+                    const secondHalf = validPains.slice(half);
+                    const fMean = firstHalf.length > 0 ? (firstHalf.reduce((a,b)=>a+b,0)/firstHalf.length) : 0;
+                    const sMean = secondHalf.length > 0 ? (secondHalf.reduce((a,b)=>a+b,0)/secondHalf.length) : 0;
+
+                    let painTrend = 'Stable';
+                    if (sMean > fMean + 0.5) painTrend = 'Increasing';
+                    else if (sMean < fMean - 0.5) painTrend = 'Decreasing';
+                    document.getElementById('rep-pain-trend').textContent = painTrend;
+                    
+                    const s_firstHalf = validSleep.slice(0, half);
+                    const s_secondHalf = validSleep.slice(half);
+                    const sfMean = s_firstHalf.length > 0 ? (s_firstHalf.reduce((a,b)=>a+b,0)/s_firstHalf.length) : 0;
+                    const ssMean = s_secondHalf.length > 0 ? (s_secondHalf.reduce((a,b)=>a+b,0)/s_secondHalf.length) : 0;
+                    let sleepTrend = 'Stable';
+                    if (ssMean > sfMean + 0.5) sleepTrend = 'Improving';
+                    else if (ssMean < sfMean - 0.5) sleepTrend = 'Worsening';
+                    document.getElementById('rep-sleep-trend').textContent = sleepTrend;
+
+                    let overallState = 'stable';
+                    if (painTrend === 'Increasing' || sleepTrend === 'Worsening') overallState = 'deteriorating';
+                    else if (painTrend === 'Decreasing' || sleepTrend === 'Improving') overallState = 'improving';
+                    document.getElementById('rep-overall-trend').textContent = overallState;
+
+                    // Flares
+                    let flares = 0;
+                    let inFlare = false;
+                    recent.forEach(d => {
+                        if (d.pain_score >= 7) {
+                            if(!inFlare) flares++;
+                            inFlare = true;
+                        } else { inFlare = false; }
+                    });
+                    document.getElementById('rep-flares').textContent = flares;
+
+                    // Risk
+                    let risk = 'Low';
+                    if (meanPain > 7 || flares > 2) risk = 'High';
+                    else if (meanPain > 4 || flares > 0) risk = 'Moderate';
+                    document.getElementById('rep-weekly-risk').textContent = risk;
+                    document.getElementById('rep-final-risk').textContent = risk;
+
+                    // Trigger
+                    const stressAvg = recent.filter(d => d.stress_score != null).map(d => parseFloat(d.stress_score));
+                    const meanStress = stressAvg.length > 0 ? (stressAvg.reduce((a,b)=>a+b,0)/stressAvg.length) : 0;
+                    
+                    const correlations = [
+                        { name: 'Sleep Quality', score: meanSleep < 4 ? 2 : (meanSleep < 6 ? 1 : 0) },
+                        { name: 'Stress Levels', score: meanStress > 6 ? 2 : (meanStress > 4 ? 1 : 0) }
+                    ];
+                    correlations.sort((a,b) => b.score - a.score);
+                    const domTrigger = correlations[0].score > 0 ? correlations[0].name : 'Various activities / Weather';
+                    document.getElementById('rep-trigger').textContent = domTrigger;
+                    document.getElementById('rep-trigger-name').textContent = domTrigger.toLowerCase();
+
+                    // Persistence
+                    const persist = risk === 'High' ? 'Yes' : 'No';
+                    document.getElementById('rep-persistent').textContent = persist;
+                    
+                    const persistMsg = document.getElementById('rep-persist-msg');
+                    if (persist === 'Yes') {
+                        persistMsg.style.display = 'flex';
+                    } else {
+                        persistMsg.style.display = 'none';
+                    }
+                }
+            }
+
+        } catch(e) { console.error('Report initialization failed:', e); }
     }
-}
 
-async function viewWeeklyReport() {
-    const weekNumber = document.getElementById('week-selector').value;
-    if (!weekNumber) return;
-    
-    showLoading();
-    try {
-        const response = await fetch(`/api/report/weekly?week_number=${weekNumber}`);
-        const data = await response.json();
-        
-        document.getElementById('weekly-report-display').innerHTML = `
-            <div class="report-card glass">
-                <h3>Week ${data.week_number} Summary</h3>
-                <div class="report-stats">
-                    <div class="stat"><strong>Avg Pain:</strong> ${data.summary.avg_pain}</div>
-                    <div class="stat"><strong>Avg Fatigue:</strong> ${data.summary.avg_fatigue}</div>
-                    <div class="stat"><strong>Avg Sleep:</strong> ${data.summary.avg_sleep}</div>
-                    <div class="stat"><strong>Avg Stress:</strong> ${data.summary.avg_stress}</div>
-                    <div class="stat"><strong>Avg Mood:</strong> ${data.summary.avg_mood}</div>
-                    <div class="stat"><strong>ACR Met:</strong> ${data.summary.acr_met ? 'Yes' : 'No'}</div>
-                </div>
-                <div class="ai-advice">
-                    <h4><i class="fas fa-lightbulb"></i> AI Recommendations</h4>
-                    <p>${data.ai_advice.replace(/\n/g, '<br>')}</p>
-                </div>
-            </div>
-        `;
-    } catch (error) {
-        showToast('Error loading report', 'error');
-    }
-    hideLoading();
-}
-
-async function exportWeeklyExcel() {
-    const weekNumber = document.getElementById('week-selector').value;
-    window.location.href = `/api/report/weekly/export-excel?week_number=${weekNumber}`;
-}
-
-async function exportWeeklyPDF() {
-    const weekNumber = document.getElementById('week-selector').value;
-    window.location.href = `/api/report/weekly/export-pdf?week_number=${weekNumber}`;
-}
-
-async function viewFinalReport() {
-    showLoading();
-    try {
-        const response = await fetch('/api/report/final');
-        const data = await response.json();
-        
-        document.getElementById('final-report-display').innerHTML = `
-            <div class="report-card glass">
-                <h3>3-Month Final Report</h3>
-                <div class="report-stats">
-                    <div class="stat"><strong>Avg Pain:</strong> ${data.averages.avg_pain}</div>
-                    <div class="stat"><strong>Avg Fatigue:</strong> ${data.averages.avg_fatigue}</div>
-                    <div class="stat"><strong>Avg Sleep:</strong> ${data.averages.avg_sleep}</div>
-                    <div class="stat"><strong>Avg Stress:</strong> ${data.averages.avg_stress}</div>
-                    <div class="stat"><strong>Avg Mood:</strong> ${data.averages.avg_mood}</div>
-                    <div class="stat"><strong>FIQr Trend:</strong> ${data.fiqr_trend}</div>
-                </div>
-                <div class="ai-advice">
-                    <h4><i class="fas fa-lightbulb"></i> AI Recommendations</h4>
-                    <p>${data.ai_advice.replace(/\n/g, '<br>')}</p>
-                </div>
-                <div class="doctor-rec">
-                    <strong>Doctor Recommendation:</strong> ${data.doctor_recommendation}
-                </div>
-            </div>
-        `;
-    } catch (error) {
-        showToast('Error loading final report', 'error');
-    }
-    hideLoading();
-}
-
-async function exportFinalExcel() {
-    window.location.href = '/api/report/final/export-excel';
-}
-
-async function exportFinalPDF() {
-    window.location.href = '/api/report/final/export-pdf';
-}
-
-window.addEventListener('load', loadWeekOptions);
+    document.getElementById('rep-type').addEventListener('change', initReport);
+    document.addEventListener('DOMContentLoaded', initReport);
 </script>
+
+<style>
+/* Modern styling and print resets */
+@media print {
+    body, html { background: white !important; height: auto !important; }
+    .sidebar, .navbar, nav, header, .footer { display: none !important; }
+    button { display: none !important; }
+    .report-template-wrapper {
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    * { color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .report-template-wrapper > div { page-break-inside: avoid; }
+}
+</style>
 {% endblock %}
