@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 import warnings
 
 # Ignore K-Means warnings for demonstration purposes
@@ -41,6 +42,13 @@ def generate_synthetic_data(days=60, scenario="fluctuating"):
                 pain = np.random.normal(4, 0.5)
                 fatigue = np.random.normal(4, 0.5)
                 sleep = np.random.normal(7, 0.5)
+        elif scenario == "persistent_high":
+            # High pain consistently to trigger persistent risk and K-Means
+            pain = np.random.normal(8, 0.5)
+            fatigue = np.random.normal(8, 0.5)
+            sleep = np.random.normal(3, 0.5)
+            stress = np.random.choice([4, 9], p=[0.3, 0.7]) # Mostly high stress
+
         else:
             # Random fluctuations
             pain += np.random.normal(0, 1)
@@ -124,6 +132,18 @@ def execute_clustering(df):
         
     kmeans = KMeans(n_clusters=2, random_state=42)
     df['cluster'] = kmeans.fit_predict(X)
+    
+    # --- EVALUATE K-MEANS ----
+    try:
+        sil_score = silhouette_score(X, df['cluster'])
+        ch_score = calinski_harabasz_score(X, df['cluster'])
+        db_score = davies_bouldin_score(X, df['cluster'])
+        print("\n  [K-Means Clustering Evaluation]")
+        print(f"  - Silhouette Score        : {sil_score:.4f}  (> 0.5 is good, closer to 1 is better)")
+        print(f"  - Calinski-Harabasz Score : {ch_score:.2f}  (Higher is better)")
+        print(f"  - Davies-Bouldin Score    : {db_score:.4f}  (Lower is better, ideally < 1.0)")
+    except Exception as e:
+        print(f"\n  [K-Means Evaluation Skipped: {e}]")
     
     # Find the cluster with highest average pain
     cluster_means = df.groupby('cluster')[features].mean()
@@ -210,3 +230,4 @@ if __name__ == "__main__":
     evaluate_tracking_pipeline("stable_low", days=35)
     evaluate_tracking_pipeline("increasing_trend", days=42)
     evaluate_tracking_pipeline("trigger_spikes", days=60)
+    evaluate_tracking_pipeline("persistent_high", days=35)
