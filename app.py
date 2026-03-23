@@ -626,9 +626,8 @@ def weekly_entry_page():
     conn.close()
     
     days_logged = res[0] if res else 0
-    # Allow access if at least 7 days logged. 
-    # For "every 7 days", we might normally check (days_logged % 7 == 0), but simple threshold is safer for UI availability.
-    is_unlocked = days_logged >= 7
+    # Unlocked for presenting purposes
+    is_unlocked = True
     
     return render_template('weekly.html', days_logged=days_logged, is_unlocked=is_unlocked)
 
@@ -643,8 +642,8 @@ def monthly_entry_page():
     conn.close()
     
     days_logged = res[0] if res else 0
-    # Allow access if at least 30 days logged.
-    is_unlocked = days_logged >= 30
+    # Unlocked for presenting purposes
+    is_unlocked = True
     
     return render_template("monthly.html", days_logged=days_logged, is_unlocked=is_unlocked)
 

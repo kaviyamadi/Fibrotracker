@@ -1,137 +1,133 @@
 {% extends "base.html" %}
 
-{% block title %}Report Template - FibroTracker{% endblock %}
+{% block title %}Clinical Report - FibroTracker{% endblock %}
 
 {% block content %}
-<div class="report-template-wrapper" style="max-width: 900px; margin: 2rem auto; font-family: 'Inter', sans-serif; background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
-    
-    <!-- Title -->
-    <h1 style="text-align: center; color: #1e3a8a; margin-bottom: 3rem; font-size: 2.2rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1.5rem; font-weight: 800;">
-        📄 WEEKLY / MONTHLY REPORT TEMPLATE
-    </h1>
+<div class="report-template-wrapper" style="max-width: 850px; margin: 2rem auto; font-family: 'Times New Roman', serif; background: white; padding: 4rem; border: 1px solid #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: #333;">
 
-    <!-- 1. Patient Details -->
-    <div style="margin-bottom: 2.5rem;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 1. Patient Details
-        </h2>
-        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; font-size: 1.1rem;">
-            <div><strong style="color: #1e293b;">Patient ID:</strong> <span id="rep-patient-id" style="color: #475569;">______</span></div>
-            <div>
-                <strong style="color: #1e293b;">Report Type:</strong> 
-                <select id="rep-type" style="padding: 0.35rem; border-radius: 6px; border: 1px solid #cbd5e1; font-family: 'Inter', sans-serif; font-size: 1rem; outline: none;">
-                    <option value="Weekly">Weekly</option>
-                    <option value="Monthly">Monthly</option>
-                </select>
-            </div>
-            <div style="grid-column: span 2;"><strong style="color: #1e293b;">Time Period:</strong> <span id="rep-time-period" style="color: #475569;">______</span></div>
+    <!-- Medical Header -->
+    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 1.5rem; margin-bottom: 2rem;">
+        <h1 style="margin: 0; font-size: 24pt; font-family: 'Arial', sans-serif; text-transform: uppercase; letter-spacing: 1px;">Clinical Synthesis Report</h1>
+        <p style="margin: 5px 0 0 0; font-size: 12pt; font-family: 'Arial', sans-serif; color: #555;">Longitudinal Symptom Tracking & Analysis</p>
+    </div>
+
+    <!-- 1. Patient Demographics -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">I. Patient Information</h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12pt;">
+            <tr>
+                <td style="padding: 6px 0; width: 25%;"><strong>Patient ID:</strong></td>
+                <td style="padding: 6px 0; width: 25%;"><span id="rep-patient-id">______</span></td>
+                <td style="padding: 6px 0; width: 25%;"><strong>Report Type:</strong></td>
+                <td style="padding: 6px 0; width: 25%;">
+                    <select id="rep-type" style="padding: 0.2rem; border: 1px solid #ccc; font-family: inherit;">
+                        <option value="Weekly Assessment">Weekly Assessment</option>
+                        <option value="Monthly Assessment">Monthly Assessment</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 6px 0;"><strong>Date range:</strong></td>
+                <td colspan="3" style="padding: 6px 0;"><span id="rep-time-period">______</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 2. Clinical Symptom Summary -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">II. Clinical Symptom Summary</h2>
+        <table style="width: 100%; border: 1px solid #333; border-collapse: collapse; text-align: center; font-size: 12pt;">
+            <tr style="background: #f5f5f5;">
+                <th style="border: 1px solid #333; padding: 10px;">Mean Pain Severity (0-10)</th>
+                <th style="border: 1px solid #333; padding: 10px;">Fatigue Index</th>
+                <th style="border: 1px solid #333; padding: 10px;">Sleep Quality Rating</th>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #333; padding: 15px; font-weight: bold;" id="rep-avg-pain">______</td>
+                <td style="border: 1px solid #333; padding: 15px; font-weight: bold;" id="rep-fatigue">______</td>
+                <td style="border: 1px solid #333; padding: 15px; font-weight: bold;" id="rep-sleep">______</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 3. Longitudinal Trend Analysis -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">III. Longitudinal Trend Analysis</h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12pt;">
+            <tr>
+                <td style="padding: 6px 0; width: 30%;"><strong>Pain Trajectory:</strong></td>
+                <td style="padding: 6px 0;" id="rep-pain-trend">______</td>
+            </tr>
+            <tr>
+                <td style="padding: 6px 0;"><strong>Sleep Trajectory:</strong></td>
+                <td style="padding: 6px 0;" id="rep-sleep-trend">______</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding: 15px 0 5px 0; font-style: italic;">
+                    <strong>Observation:</strong> Longitudinal data indicates a clinical status that is currently 
+                    <strong id="rep-overall-trend">______</strong>.
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 4. Exacerbation (Flare) Analysis -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">IV. Exacerbation Incidence (Flare Analysis)</h2>
+        <p style="margin-bottom: 5px; font-size: 12pt;"><strong>Documented Flare Events:</strong> <span id="rep-flares" style="font-weight: bold;">0</span></p>
+        <p style="margin: 0; font-size: 11pt; color: #555;"><em>Note: An exacerbation event is defined clinically as a documented acute increase in symptom severity significantly above baseline.</em></p>
+    </div>
+
+    <!-- 5. Clinical Risk Stratification -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">V. Clinical Risk Stratification</h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12pt;">
+            <tr>
+                <td style="padding: 6px 0; width: 40%;"><strong>Assessed Risk Level (Current Period):</strong></td>
+                <td style="padding: 6px 0;" id="rep-weekly-risk">______</td>
+            </tr>
+            <tr>
+                <td style="padding: 6px 0;"><strong>Cumulative Risk Stratification:</strong></td>
+                <td style="padding: 6px 0;" id="rep-final-risk">______</td>
+            </tr>
+            <tr>
+                <td style="padding: 6px 0;"><strong>Risk Persistence Indicators:</strong></td>
+                <td style="padding: 6px 0;" id="rep-persistent">______</td>
+            </tr>
+        </table>
+        <div id="rep-persist-msg" style="display: none; margin-top: 10px; font-size: 11pt; font-style: italic; color: #555;">
+            * Clinical warning: Sustained symptom elevation noted during review period.
         </div>
     </div>
 
-    <!-- 2. Symptom Summary -->
-    <div style="margin-bottom: 2.5rem;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 2. Symptom Summary
-        </h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-            <div style="background: #fef2f2; padding: 1.5rem; border-radius: 10px; border: 1px solid #fca5a5; text-align: center; box-shadow: 0 2px 4px rgba(254,226,226,0.3);">
-                <div style="font-weight: 600; color: #991b1b; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;">Average Pain</div>
-                <div id="rep-avg-pain" style="font-size: 1.8rem; font-weight: 800; color: #7f1d1d;">______</div>
-            </div>
-            <div style="background: #fff7ed; padding: 1.5rem; border-radius: 10px; border: 1px solid #fdba74; text-align: center; box-shadow: 0 2px 4px rgba(255,237,213,0.3);">
-                <div style="font-weight: 600; color: #9a3412; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;">Fatigue Level</div>
-                <div id="rep-fatigue" style="font-size: 1.8rem; font-weight: 800; color: #7c2d12;">Moderate</div>
-            </div>
-            <div style="background: #f0fdf4; padding: 1.5rem; border-radius: 10px; border: 1px solid #86efac; text-align: center; box-shadow: 0 2px 4px rgba(220,252,231,0.3);">
-                <div style="font-weight: 600; color: #166534; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;">Sleep Quality</div>
-                <div id="rep-sleep" style="font-size: 1.8rem; font-weight: 800; color: #14532d;">Good</div>
-            </div>
-        </div>
+    <!-- 6. Exacerbating Factors -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">VI. Primary Exacerbating Factors</h2>
+        <p style="margin-bottom: 5px; font-size: 12pt;"><strong>Identified Triggering Factor:</strong> <span id="rep-trigger" style="font-weight: bold;">______</span></p>
+        <p style="margin: 0; font-size: 11pt; color: #555;"><em>Clinical correlation indicates that <span id="rep-trigger-name">______</span> demonstrates a significant association with reported symptom variance.</em></p>
     </div>
 
-    <!-- 3. Trend Analysis -->
-    <div style="margin-bottom: 2.5rem; background: #f8fafc; padding: 2rem; border-radius: 10px; border-left: 5px solid #3b82f6;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 3. Trend Analysis
-        </h2>
-        <ul style="list-style-type: none; padding: 0; margin-bottom: 1.5rem; font-size: 1.15rem; color: #334155;">
-            <li style="margin-bottom: 0.75rem;"><strong style="color: #1e293b;">Pain Trend:</strong> <span id="rep-pain-trend" style="font-weight: 500;">Stable</span></li>
-            <li><strong style="color: #1e293b;">Sleep Trend:</strong> <span id="rep-sleep-trend" style="font-weight: 500;">Improving</span></li>
-        </ul>
-        <div style="background: #eff6ff; padding: 1.25rem; border-radius: 8px; color: #1e40af; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
-            <span style="font-size: 1.4rem;">👉</span> “Overall trend indicates <strong id="rep-overall-trend" style="text-decoration: underline; margin: 0 0.4rem;">______</strong> condition.”
-        </div>
-    </div>
-
-    <!-- 4. Flare Analysis -->
-    <div style="margin-bottom: 2.5rem; background: #fff1f2; padding: 2rem; border-radius: 10px; border-left: 5px solid #e11d48;">
-        <h2 style="color: #e11d48; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #fda4af;">🔹</span> 4. Flare Analysis
-        </h2>
-        <div style="font-size: 1.15rem; color: #334155; margin-bottom: 1.5rem;">
-            <strong style="color: #1e293b;">Number of Flares:</strong> <span id="rep-flares" style="font-weight: 800; font-size: 1.5rem; color: #be123c;">0</span>
-        </div>
-        <div style="background: #ffe4e6; padding: 1.25rem; border-radius: 8px; color: #9f1239; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
-            <span style="font-size: 1.4rem;">👉</span> “Flare-ups indicate sudden worsening of symptoms.”
-        </div>
-    </div>
-
-    <!-- 5. Risk Assessment -->
-    <div style="margin-bottom: 2.5rem;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 5. Risk Assessment
-        </h2>
-        <div style="display: flex; gap: 3rem; margin-bottom: 1.5rem; font-size: 1.15rem; color: #334155; padding: 0 1rem;">
-            <div><strong style="color: #1e293b;">Weekly Risk Level:</strong> <span id="rep-weekly-risk" style="font-weight: 600;">Moderate</span></div>
-            <div><strong style="color: #1e293b;">Final Risk Level:</strong> <span id="rep-final-risk" style="font-weight: 600;">______</span></div>
-        </div>
-        <div style="background: #f1f5f9; padding: 1.25rem; border-radius: 8px; color: #334155; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
-            <span style="font-size: 1.4rem;">👉</span> “Risk level is determined based on symptom severity and consistency.”
-        </div>
-    </div>
-
-    <!-- 6. Trigger Insight -->
-    <div style="margin-bottom: 2.5rem;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 6. Trigger Insight
-        </h2>
-        <div style="font-size: 1.15rem; color: #334155; margin-bottom: 1.5rem; padding: 0 1rem;">
-            <strong style="color: #1e293b;">Dominant Trigger:</strong> <span id="rep-trigger" style="font-weight: 600;">Stress</span>
-        </div>
-        <div style="background: #f1f5f9; padding: 1.25rem; border-radius: 8px; color: #334155; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
-            <span style="font-size: 1.4rem;">👉</span> “This suggests that <strong id="rep-trigger-name" style="text-decoration: underline; margin: 0 0.4rem;">______</strong> is influencing symptom severity.”
-        </div>
-    </div>
-
-    <!-- 7. Persistence Status -->
-    <div style="margin-bottom: 2.5rem;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 7. Persistence Status
-        </h2>
-        <div style="font-size: 1.15rem; color: #334155; margin-bottom: 1.5rem; padding: 0 1rem;">
-            <strong style="color: #1e293b;">Persistent Risk:</strong> <span id="rep-persistent" style="font-weight: 600;">No</span>
-        </div>
-        <div id="rep-persist-msg" style="background: #f1f5f9; padding: 1.25rem; border-radius: 8px; color: #334155; font-style: italic; font-size: 1.1rem; display: flex; gap: 0.75rem; align-items: center;">
-            <span style="font-size: 1.4rem;">👉</span> “Symptoms are consistently elevated over time.”
-        </div>
-    </div>
-
-    <!-- 8. Recommendation -->
-    <div style="margin-bottom: 1rem;">
-        <h2 style="color: #3b82f6; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: #93c5fd;">🔹</span> 8. Recommendation
-        </h2>
-        <ul style="background: #f0fdf4; padding: 2rem 2rem 2rem 3rem; border-radius: 10px; border: 1px solid #bbf7d0; color: #166534; font-size: 1.15rem; line-height: 1.8; margin: 0; box-shadow: 0 2px 5px rgba(220,252,231,0.5);">
-            <li>Improve sleep routine <span style="font-size: 1.3rem; margin-left: 0.5rem;">🌙</span></li>
-            <li>Reduce stress levels <span style="font-size: 1.3rem; margin-left: 0.5rem;">🧘</span></li>
-            <li>Maintain regular physical activity <span style="font-size: 1.3rem; margin-left: 0.5rem;">🚶</span></li>
+    <!-- 7. Clinical Recommendations -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">VII. Clinical Recommendations</h2>
+        <ul style="margin: 0 0 0 20px; padding: 0; font-size: 12pt; line-height: 1.6;">
+            <li>Implement targeted sleep hygiene protocols to optimize restorative sleep phases.</li>
+            <li>Incorporate stress reduction interventions and cognitive behavioral strategies.</li>
+            <li>Maintain consistent pacing with graded physical activity programs as tolerated.</li>
         </ul>
     </div>
-    
+
+    <!-- Signature block -->
+    <div style="margin-top: 4rem; border-top: 1px solid #333; width: 300px; padding-top: 10px; text-align: center; float: right;">
+        <p style="margin: 0; font-size: 12pt; font-family: 'Arial', sans-serif;">Generated by FibroTracker System</p>
+        <p style="margin: 0; font-size: 10pt; color: #555;">Electronically Synthesized</p>
+    </div>
+    <div style="clear: both;"></div>
+
     <!-- Print Button -->
-    <div style="text-align: center; margin-top: 4rem;">
-         <button onclick="window.print()" style="background: #1e3a8a; color: white; border: none; padding: 1rem 2.5rem; font-size: 1.15rem; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; transition: background 0.2s; box-shadow: 0 4px 6px rgba(30, 58, 138, 0.3);">
-             <i class="fas fa-print"></i> Print / Save as PDF
+    <div style="text-align: center; margin-top: 4rem;" class="no-print">
+         <button onclick="window.print()" style="background: #333; color: white; border: none; padding: 0.8rem 2rem; font-size: 1rem; font-family: 'Arial', sans-serif; border-radius: 4px; cursor: pointer;">
+             Print / Save as Medical PDF
          </button>
     </div>
 
@@ -148,7 +144,7 @@
             }
 
             const timeframe = document.getElementById('rep-type').value; 
-            const days = timeframe === 'Weekly' ? 7 : 30;
+            const days = timeframe === 'Weekly Assessment' ? 7 : (timeframe === 'Weekly' ? 7 : 30);
             
             const d = new Date();
             const dateString = d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
@@ -223,10 +219,10 @@
                     
                     const correlations = [
                         { name: 'Sleep Quality', score: meanSleep < 4 ? 2 : (meanSleep < 6 ? 1 : 0) },
-                        { name: 'Stress Levels', score: meanStress > 6 ? 2 : (meanStress > 4 ? 1 : 0) }
+                        { name: 'Psychosocial Stress', score: meanStress > 6 ? 2 : (meanStress > 4 ? 1 : 0) }
                     ];
                     correlations.sort((a,b) => b.score - a.score);
-                    const domTrigger = correlations[0].score > 0 ? correlations[0].name : 'Various activities / Weather';
+                    const domTrigger = correlations[0].score > 0 ? correlations[0].name : 'Multifactorial (Weather/Activity)';
                     document.getElementById('rep-trigger').textContent = domTrigger;
                     document.getElementById('rep-trigger-name').textContent = domTrigger.toLowerCase();
 
@@ -236,7 +232,7 @@
                     
                     const persistMsg = document.getElementById('rep-persist-msg');
                     if (persist === 'Yes') {
-                        persistMsg.style.display = 'flex';
+                        persistMsg.style.display = 'block';
                     } else {
                         persistMsg.style.display = 'none';
                     }
@@ -255,9 +251,10 @@
 @media print {
     body, html { background: white !important; height: auto !important; }
     .sidebar, .navbar, nav, header, .footer { display: none !important; }
-    button { display: none !important; }
+    .no-print { display: none !important; }
     .report-template-wrapper {
         box-shadow: none !important;
+        border: none !important;
         padding: 0 !important;
         margin: 0 !important;
         max-width: 100% !important;
