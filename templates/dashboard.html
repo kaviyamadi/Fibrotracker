@@ -10,7 +10,7 @@
     <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);">
         <h1 style="margin: 0 0 1rem 0; font-size: 2rem; font-weight: 700;">Fibromyalgia Monitoring Dashboard</h1>
         <div style="display: flex; gap: 3rem; font-size: 1.1rem; opacity: 0.9;">
-            <div><i class="fas fa-user" style="margin-right: 0.5rem;"></i><strong>Patient ID:</strong> <span id="patient-id">Loading...</span></div>
+            <div><i class="fas fa-user" style="margin-right: 0.5rem;"></i><strong>Username:</strong> <span id="username-display">{{ session.get('username', 'User') }}</span></div>
             <div><i class="fas fa-calendar" style="margin-right: 0.5rem;"></i><strong>Date Range:</strong> <span id="date-range">Last 30 Days</span></div>
         </div>
     </div>
@@ -59,11 +59,10 @@
 
     async function fetchDashboardData() {
         try {
-            // Fetch Patient Profile
+            // Fetch Patient Profile (Remaining metadata)
             const profileRes = await fetch('/api/profile');
             if (profileRes.ok) {
-                const profile = await profileRes.json();
-                document.getElementById('patient-id').textContent = 'PT-' + String(profile.id || '001').padStart(4, '0');
+                // Profile found
             }
 
             // Fetch Daily Data

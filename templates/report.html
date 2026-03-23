@@ -3,21 +3,27 @@
 {% block title %}Clinical Report - FibroTracker{% endblock %}
 
 {% block content %}
-<div class="report-template-wrapper" style="max-width: 850px; margin: 2rem auto; font-family: 'Times New Roman', serif; background: white; padding: 4rem; border: 1px solid #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: #333;">
+<div class="report-template-wrapper"
+    style="max-width: 850px; margin: 2rem auto; font-family: 'Times New Roman', serif; background: white; padding: 4rem; border: 1px solid #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: #333;">
 
     <!-- Medical Header -->
     <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 1.5rem; margin-bottom: 2rem;">
-        <h1 style="margin: 0; font-size: 24pt; font-family: 'Arial', sans-serif; text-transform: uppercase; letter-spacing: 1px;">Clinical Synthesis Report</h1>
-        <p style="margin: 5px 0 0 0; font-size: 12pt; font-family: 'Arial', sans-serif; color: #555;">Longitudinal Symptom Tracking & Analysis</p>
+        <h1
+            style="margin: 0; font-size: 24pt; font-family: 'Arial', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+            Clinical Report</h1>
+        <p style="margin: 5px 0 0 0; font-size: 12pt; font-family: 'Arial', sans-serif; color: #555;">Longitudinal
+            Symptom Tracking & Analysis</p>
     </div>
 
     <!-- 1. Patient Demographics -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">I. Patient Information</h2>
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            I. Patient Information</h2>
         <table style="width: 100%; border-collapse: collapse; font-size: 12pt;">
             <tr>
-                <td style="padding: 6px 0; width: 25%;"><strong>Patient ID:</strong></td>
-                <td style="padding: 6px 0; width: 25%;"><span id="rep-patient-id">______</span></td>
+                <td style="padding: 6px 0; width: 25%;"><strong>Username:</strong></td>
+                <td style="padding: 6px 0; width: 25%;"><span id="rep-username">{{ session.get('username', 'User') }}</span></td>
                 <td style="padding: 6px 0; width: 25%;"><strong>Report Type:</strong></td>
                 <td style="padding: 6px 0; width: 25%;">
                     <select id="rep-type" style="padding: 0.2rem; border: 1px solid #ccc; font-family: inherit;">
@@ -35,8 +41,11 @@
 
     <!-- 2. Clinical Symptom Summary -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">II. Clinical Symptom Summary</h2>
-        <table style="width: 100%; border: 1px solid #333; border-collapse: collapse; text-align: center; font-size: 12pt;">
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            II. Clinical Symptom Summary</h2>
+        <table
+            style="width: 100%; border: 1px solid #333; border-collapse: collapse; text-align: center; font-size: 12pt;">
             <tr style="background: #f5f5f5;">
                 <th style="border: 1px solid #333; padding: 10px;">Mean Pain Severity (0-10)</th>
                 <th style="border: 1px solid #333; padding: 10px;">Fatigue Index</th>
@@ -52,7 +61,9 @@
 
     <!-- 3. Longitudinal Trend Analysis -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">III. Longitudinal Trend Analysis</h2>
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            III. Longitudinal Trend Analysis</h2>
         <table style="width: 100%; border-collapse: collapse; font-size: 12pt;">
             <tr>
                 <td style="padding: 6px 0; width: 30%;"><strong>Pain Trajectory:</strong></td>
@@ -64,7 +75,7 @@
             </tr>
             <tr>
                 <td colspan="2" style="padding: 15px 0 5px 0; font-style: italic;">
-                    <strong>Observation:</strong> Longitudinal data indicates a clinical status that is currently 
+                    <strong>Observation:</strong> Longitudinal data indicates a clinical status that is currently
                     <strong id="rep-overall-trend">______</strong>.
                 </td>
             </tr>
@@ -73,14 +84,20 @@
 
     <!-- 4. Exacerbation (Flare) Analysis -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">IV. Exacerbation Incidence (Flare Analysis)</h2>
-        <p style="margin-bottom: 5px; font-size: 12pt;"><strong>Documented Flare Events:</strong> <span id="rep-flares" style="font-weight: bold;">0</span></p>
-        <p style="margin: 0; font-size: 11pt; color: #555;"><em>Note: An exacerbation event is defined clinically as a documented acute increase in symptom severity significantly above baseline.</em></p>
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            IV. Exacerbation Incidence (Flare Analysis)</h2>
+        <p style="margin-bottom: 5px; font-size: 12pt;"><strong>Documented Flare Events:</strong> <span id="rep-flares"
+                style="font-weight: bold;">0</span></p>
+        <p style="margin: 0; font-size: 11pt; color: #555;"><em>Note: An exacerbation event is defined clinically as a
+                documented acute increase in symptom severity significantly above baseline.</em></p>
     </div>
 
     <!-- 5. Clinical Risk Stratification -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">V. Clinical Risk Stratification</h2>
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            V. Clinical Risk Stratification</h2>
         <table style="width: 100%; border-collapse: collapse; font-size: 12pt;">
             <tr>
                 <td style="padding: 6px 0; width: 40%;"><strong>Assessed Risk Level (Current Period):</strong></td>
@@ -95,21 +112,29 @@
                 <td style="padding: 6px 0;" id="rep-persistent">______</td>
             </tr>
         </table>
-        <div id="rep-persist-msg" style="display: none; margin-top: 10px; font-size: 11pt; font-style: italic; color: #555;">
+        <div id="rep-persist-msg"
+            style="display: none; margin-top: 10px; font-size: 11pt; font-style: italic; color: #555;">
             * Clinical warning: Sustained symptom elevation noted during review period.
         </div>
     </div>
 
     <!-- 6. Exacerbating Factors -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">VI. Primary Exacerbating Factors</h2>
-        <p style="margin-bottom: 5px; font-size: 12pt;"><strong>Identified Triggering Factor:</strong> <span id="rep-trigger" style="font-weight: bold;">______</span></p>
-        <p style="margin: 0; font-size: 11pt; color: #555;"><em>Clinical correlation indicates that <span id="rep-trigger-name">______</span> demonstrates a significant association with reported symptom variance.</em></p>
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            VI. Primary Exacerbating Factors</h2>
+        <p style="margin-bottom: 5px; font-size: 12pt;"><strong>Identified Triggering Factor:</strong> <span
+                id="rep-trigger" style="font-weight: bold;">______</span></p>
+        <p style="margin: 0; font-size: 11pt; color: #555;"><em>Clinical correlation indicates that <span
+                    id="rep-trigger-name">______</span> demonstrates a significant association with reported symptom
+                variance.</em></p>
     </div>
 
     <!-- 7. Clinical Recommendations -->
     <div style="margin-bottom: 2rem;">
-        <h2 style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">VII. Clinical Recommendations</h2>
+        <h2
+            style="font-size: 14pt; font-family: 'Arial', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 1rem; text-transform: uppercase;">
+            VII. Clinical Recommendations</h2>
         <ul style="margin: 0 0 0 20px; padding: 0; font-size: 12pt; line-height: 1.6;">
             <li>Implement targeted sleep hygiene protocols to optimize restorative sleep phases.</li>
             <li>Incorporate stress reduction interventions and cognitive behavioral strategies.</li>
@@ -118,7 +143,8 @@
     </div>
 
     <!-- Signature block -->
-    <div style="margin-top: 4rem; border-top: 1px solid #333; width: 300px; padding-top: 10px; text-align: center; float: right;">
+    <div
+        style="margin-top: 4rem; border-top: 1px solid #333; width: 300px; padding-top: 10px; text-align: center; float: right;">
         <p style="margin: 0; font-size: 12pt; font-family: 'Arial', sans-serif;">Generated by FibroTracker System</p>
         <p style="margin: 0; font-size: 10pt; color: #555;">Electronically Synthesized</p>
     </div>
@@ -126,9 +152,10 @@
 
     <!-- Print Button -->
     <div style="text-align: center; margin-top: 4rem;" class="no-print">
-         <button onclick="window.print()" style="background: #333; color: white; border: none; padding: 0.8rem 2rem; font-size: 1rem; font-family: 'Arial', sans-serif; border-radius: 4px; cursor: pointer;">
-             Print / Save as Medical PDF
-         </button>
+        <button onclick="window.print()"
+            style="background: #333; color: white; border: none; padding: 0.8rem 2rem; font-size: 1rem; font-family: 'Arial', sans-serif; border-radius: 4px; cursor: pointer;">
+            Print / Save as Medical PDF
+        </button>
     </div>
 
 </div>
@@ -136,18 +163,17 @@
 <script>
     async function initReport() {
         try {
-            // Patient ID Logic
+            // Fetch Patient Profile (Remaining metadata)
             const profileRes = await fetch('/api/profile');
-            if(profileRes.ok) {
-                const profile = await profileRes.json();
-                document.getElementById('rep-patient-id').textContent = 'PT-' + String(profile.id || '001').padStart(4, '0');
+            if (profileRes.ok) {
+                // Profile found
             }
 
-            const timeframe = document.getElementById('rep-type').value; 
+            const timeframe = document.getElementById('rep-type').value;
             const days = timeframe === 'Weekly Assessment' ? 7 : (timeframe === 'Weekly' ? 7 : 30);
-            
+
             const d = new Date();
-            const dateString = d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+            const dateString = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             document.getElementById('rep-time-period').textContent = `Ending ${dateString} (${days} Days)`;
 
             const res = await fetch('/api/dashboard/daily');
@@ -155,36 +181,36 @@
                 const data = await res.json();
                 if (data && data.length > 0) {
                     const recent = data.slice(-days);
-                    
+
                     // Averages
                     const validPains = recent.filter(d => d.pain_score != null).map(d => parseFloat(d.pain_score));
-                    const meanPain = validPains.length > 0 ? (validPains.reduce((a,b)=>a+b, 0) / validPains.length) : 0;
+                    const meanPain = validPains.length > 0 ? (validPains.reduce((a, b) => a + b, 0) / validPains.length) : 0;
                     document.getElementById('rep-avg-pain').textContent = meanPain.toFixed(1);
 
                     const validFatigue = recent.filter(d => d.fatigue != null).map(d => parseFloat(d.fatigue));
-                    const meanFatigue = validFatigue.length > 0 ? (validFatigue.reduce((a,b)=>a+b, 0) / validFatigue.length) : 0;
+                    const meanFatigue = validFatigue.length > 0 ? (validFatigue.reduce((a, b) => a + b, 0) / validFatigue.length) : 0;
                     document.getElementById('rep-fatigue').textContent = meanFatigue > 6 ? 'High' : (meanFatigue > 3 ? 'Moderate' : 'Low');
 
                     const validSleep = recent.filter(d => d.sleep != null).map(d => parseFloat(d.sleep));
-                    const meanSleep = validSleep.length > 0 ? (validSleep.reduce((a,b)=>a+b, 0) / validSleep.length) : 0;
+                    const meanSleep = validSleep.length > 0 ? (validSleep.reduce((a, b) => a + b, 0) / validSleep.length) : 0;
                     document.getElementById('rep-sleep').textContent = meanSleep < 4 ? 'Poor' : (meanSleep < 7 ? 'Moderate' : 'Good');
 
                     // Trends
-                    const half = Math.floor(validPains.length/2);
+                    const half = Math.floor(validPains.length / 2);
                     const firstHalf = validPains.slice(0, half);
                     const secondHalf = validPains.slice(half);
-                    const fMean = firstHalf.length > 0 ? (firstHalf.reduce((a,b)=>a+b,0)/firstHalf.length) : 0;
-                    const sMean = secondHalf.length > 0 ? (secondHalf.reduce((a,b)=>a+b,0)/secondHalf.length) : 0;
+                    const fMean = firstHalf.length > 0 ? (firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length) : 0;
+                    const sMean = secondHalf.length > 0 ? (secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length) : 0;
 
                     let painTrend = 'Stable';
                     if (sMean > fMean + 0.5) painTrend = 'Increasing';
                     else if (sMean < fMean - 0.5) painTrend = 'Decreasing';
                     document.getElementById('rep-pain-trend').textContent = painTrend;
-                    
+
                     const s_firstHalf = validSleep.slice(0, half);
                     const s_secondHalf = validSleep.slice(half);
-                    const sfMean = s_firstHalf.length > 0 ? (s_firstHalf.reduce((a,b)=>a+b,0)/s_firstHalf.length) : 0;
-                    const ssMean = s_secondHalf.length > 0 ? (s_secondHalf.reduce((a,b)=>a+b,0)/s_secondHalf.length) : 0;
+                    const sfMean = s_firstHalf.length > 0 ? (s_firstHalf.reduce((a, b) => a + b, 0) / s_firstHalf.length) : 0;
+                    const ssMean = s_secondHalf.length > 0 ? (s_secondHalf.reduce((a, b) => a + b, 0) / s_secondHalf.length) : 0;
                     let sleepTrend = 'Stable';
                     if (ssMean > sfMean + 0.5) sleepTrend = 'Improving';
                     else if (ssMean < sfMean - 0.5) sleepTrend = 'Worsening';
@@ -200,7 +226,7 @@
                     let inFlare = false;
                     recent.forEach(d => {
                         if (d.pain_score >= 7) {
-                            if(!inFlare) flares++;
+                            if (!inFlare) flares++;
                             inFlare = true;
                         } else { inFlare = false; }
                     });
@@ -215,13 +241,13 @@
 
                     // Trigger
                     const stressAvg = recent.filter(d => d.stress_score != null).map(d => parseFloat(d.stress_score));
-                    const meanStress = stressAvg.length > 0 ? (stressAvg.reduce((a,b)=>a+b,0)/stressAvg.length) : 0;
-                    
+                    const meanStress = stressAvg.length > 0 ? (stressAvg.reduce((a, b) => a + b, 0) / stressAvg.length) : 0;
+
                     const correlations = [
                         { name: 'Sleep Quality', score: meanSleep < 4 ? 2 : (meanSleep < 6 ? 1 : 0) },
                         { name: 'Psychosocial Stress', score: meanStress > 6 ? 2 : (meanStress > 4 ? 1 : 0) }
                     ];
-                    correlations.sort((a,b) => b.score - a.score);
+                    correlations.sort((a, b) => b.score - a.score);
                     const domTrigger = correlations[0].score > 0 ? correlations[0].name : 'Multifactorial (Weather/Activity)';
                     document.getElementById('rep-trigger').textContent = domTrigger;
                     document.getElementById('rep-trigger-name').textContent = domTrigger.toLowerCase();
@@ -229,7 +255,7 @@
                     // Persistence
                     const persist = risk === 'High' ? 'Yes' : 'No';
                     document.getElementById('rep-persistent').textContent = persist;
-                    
+
                     const persistMsg = document.getElementById('rep-persist-msg');
                     if (persist === 'Yes') {
                         persistMsg.style.display = 'block';
@@ -239,7 +265,7 @@
                 }
             }
 
-        } catch(e) { console.error('Report initialization failed:', e); }
+        } catch (e) { console.error('Report initialization failed:', e); }
     }
 
     document.getElementById('rep-type').addEventListener('change', initReport);
@@ -247,20 +273,44 @@
 </script>
 
 <style>
-/* Modern styling and print resets */
-@media print {
-    body, html { background: white !important; height: auto !important; }
-    .sidebar, .navbar, nav, header, .footer { display: none !important; }
-    .no-print { display: none !important; }
-    .report-template-wrapper {
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: 100% !important;
+    /* Modern styling and print resets */
+    @media print {
+
+        body,
+        html {
+            background: white !important;
+            height: auto !important;
+        }
+
+        .sidebar,
+        .navbar,
+        nav,
+        header,
+        .footer {
+            display: none !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .report-template-wrapper {
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+
+        * {
+            color: black !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .report-template-wrapper>div {
+            page-break-inside: avoid;
+        }
     }
-    * { color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .report-template-wrapper > div { page-break-inside: avoid; }
-}
 </style>
 {% endblock %}
