@@ -1284,21 +1284,40 @@
             Q5g: getVal('Q5g'),
             Q5h: getVal('Q5h'),
             Q5i: getVal('Q5i'),
-            Q5j: getVal('Q5j'),
             Q6_sleep_med: getVal('Q6_sleep_med'),
             Q7_daytime_sleepy: getVal('Q7_daytime_sleepy'),
             Q8_enthusiasm_problem: getVal('Q8_enthusiasm_problem'),
             Q9_subjective_quality: getVal('sleep_quality_rating')
         };
+        
+        const q5j_value = getVal('Q5j') || 0;
 
         // Check completeness
-        const allFieldsFilled = Object.values(input).every(v => v !== null && v !== "");
+        const missingFields = Object.keys(input).filter(k => input[k] === null || input[k] === "");
         const scoreDisplay = document.getElementById('psqi-score');
         const interpretationDisplay = document.getElementById('psqi-interpretation');
 
-        if (!allFieldsFilled) {
+        if (missingFields.length > 0) {
+            const friendlyNames = {
+                Q1_bed_time: "Bedtime (include AM/PM)",
+                Q2_sleep_latency_min: "Sleep Latency",
+                Q3_wake_time: "Wake Time (include AM/PM)",
+                Q4a_hours_slept: "Actual Sleep Hours",
+                Q5a: "Question 5a", Q5b: "Question 5b", Q5c: "Question 5c",
+                Q5d: "Question 5d", Q5e: "Question 5e", Q5f: "Question 5f",
+                Q5g: "Question 5g", Q5h: "Question 5h", Q5i: "Question 5i",
+                Q6_sleep_med: "Question 6", Q7_daytime_sleepy: "Question 7",
+                Q8_enthusiasm_problem: "Question 8", Q9_subjective_quality: "Overall Sleep Quality"
+            };
+
+            const firstMissing = missingFields[0];
+            let errorMsg = "Missing: " + friendlyNames[firstMissing];
+            if (missingFields.length > 1) {
+                errorMsg += ` (+${missingFields.length - 1} more)`;
+            }
+
             scoreDisplay.textContent = '--';
-            interpretationDisplay.textContent = 'Please complete all questions to calculate score';
+            interpretationDisplay.textContent = errorMsg;
             interpretationDisplay.className = 'score-interpretation';
             return;
         }
@@ -1320,7 +1339,7 @@
             const Q5g = input.Q5g;
             const Q5h = input.Q5h;
             const Q5i = input.Q5i;
-            const Q5j = input.Q5j;
+            const Q5j = q5j_value;
 
             const Q6 = input.Q6_sleep_med;
             const Q7 = input.Q7_daytime_sleepy;
@@ -1433,7 +1452,7 @@
 
             scoreDisplay.textContent = psqiScore;
 
-            if (psqiScore >= 5) {
+            if (psqiScore > 5) {
                 interpretationDisplay.textContent = "Poor sleep quality";
                 interpretationDisplay.className = 'score-interpretation poor';
             } else {
